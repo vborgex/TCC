@@ -51,6 +51,6 @@ Criar uma plataforma intuitiva e acessível que facilite a gestão de feiras edu
 ## 👩‍💻 Desenvolvido por
 
 **Vanessa [@vborgex]**   
-Professora Orientadora: Giovane Galvão
+Professor Orientador: Giovane Galvão
 
 ---
