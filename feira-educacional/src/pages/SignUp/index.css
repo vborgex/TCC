@@ -1,0 +1,39 @@
+/* ======== Card de Cadastro ======== */
+.card-cadastro {
+  width: 100%;
+  max-width: 420px;
+  padding: 2rem;
+  border-radius: 2rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  background-color: var(--secondary);
+  font-size: clamp(0.95rem, 1vw, 1.1rem);
+}
+
+/* ======== Botões ======== */
+.card-cadastro .btn {
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  padding: 0.75rem 1rem;
+}
+
+/* ======== Inputs ======== */
+.card-cadastro .form-control {
+  font-size: clamp(1rem, 1.2vw, 1.2rem);
+  background-color: var(--background);
+  border: 2.5px solid var(--accent);
+  border-radius: 0.8rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-cadastro .form-control:focus {
+  border-color: var(--accent);
+  box-shadow: none;
+  outline: none;
+  background-color: var(--secondary);
+}
+
+/* ======== Responsividade ======== */
+@media (max-width: 576px) {
+  .card-cadastro {
+    padding: 1.25rem;
+  }
+}
