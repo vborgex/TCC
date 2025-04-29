@@ -9,7 +9,6 @@ const getAuthErrorMessage = (errorCode) => {
       return "E-mail inválido!";
     case "auth/weak-password":
       return "A senha precisa ter pelo menos 6 caracteres.";
-    case "auth/user-not-found":
     case "auth/wrong-password":
       return "E-mail ou senha incorretos.";
     default:

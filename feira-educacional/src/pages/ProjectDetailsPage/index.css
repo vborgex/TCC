@@ -1,0 +1,217 @@
+/* ======== Background ======== */
+.background {
+    background-image: url('../../assets/Background3.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    width: 100%;
+  }
+  
+  #eventName{
+    font-weight: bolder;
+    color: var(--accent);
+  }
+  /* ======== Card de Login ======== */
+  .card-create-project {
+    width: 100%;
+    max-width: 900px;
+    padding: 2rem;
+    border-radius: 2rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    background-color: var(--secondary);
+    font-size: clamp(0.95rem, 1vw, 1.1rem);
+  }
+  
+  /* ======== Logo ======== */
+  .logo {
+    max-width: 300px;
+    height: auto;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.3));
+  }
+  
+  /* ======== Botões ======== */
+  .card-create-project .btn {
+    font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+    padding: 0.75rem 1rem;
+  }
+  
+  .label{
+    color: var(--accent);
+    font-weight: bold;
+    margin: 2px;
+    font-size: clamp(1rem, 2vw, 1.1rem);;
+  }
+
+  .btn-outline-custom {
+    color: var(--primary);
+    border: 2.5px solid var(--primary);
+    background-color: transparent;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-outline-custom:hover {
+    background-color: var(--primary);
+    color: var(--secondary);
+    border-color: transparent;
+  }
+
+  .btn-regulamento {
+    width: 100%;
+    padding: 0 0.8rem;
+    max-height: 45px;
+    font-size: clamp(0.95rem, 1vw, 1.1rem);
+    border-radius: 0.8rem; 
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  
+  .btn-custom {
+    background-color: var(--primary);
+    color: var(--secondary);
+    border: 2.5px solid transparent;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-custom:hover {
+    background-color: var(--secondary);
+    color: var(--primary);
+    border: 2.5px solid var(--primary);
+  }
+  .btn-cancelar {
+    background-color: var(--alert);
+    color: var(--alertText);
+    font-weight: bold;
+    border: none;
+  }
+  
+  .btn-cancelar:hover {
+    background-color: #ffbdbd;
+  }
+  
+  .btn-confirmar {
+    background-color: var(--success);
+    color: var(--successText);
+    font-weight: bold;
+    border: none;
+  }
+  
+  .btn-confirmar:hover {
+    background-color: #a9eacb;
+  }
+  
+
+  /* ======== Inputs ======== */
+  .form-control {
+    font-size: clamp(1rem, 1.2vw, 1.2rem);
+    background-color: var(--background);
+    border: 2.5px solid var(--accent);
+    border-radius: 0.8rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .form-control:focus {
+    border-color: var(--accent);
+    box-shadow: none;
+    outline: none;
+    background-color: var(--secondary);
+  }
+  
+  .input-group .form-control {
+    border-radius: 0.8rem 0 0 0.8rem;
+    border-right: none;
+  }
+  
+  .input-group .btn-icon-only {
+    background: var(--accent);
+    border: 2.5px solid var(--accent);
+    border-left: none;
+    border-radius: 0 0.8rem 0.8rem 0;
+    padding: 0 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--secondary);
+    font-size: clamp(1.2rem, 2vw, 1.4rem);
+  }
+  
+  .input-group .btn-icon-only:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: var(--accent);
+  }
+  
+  .form-check .form-check-input {
+    border: 2.5px solid var(--accent);
+  }
+  
+  .form-check .form-check-input:checked {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: var(--secondary);
+  }
+  
+  .form-check .form-check-input:focus {
+    box-shadow: none;
+  }
+  
+  .form-check {
+    font-size: 1.1rem;
+  }
+
+  
+/* ======== Dropdown ========*/
+
+#dropdownMenuButton {
+  background-color: var(--background); /* roxinho */
+  color: var(--accent);
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.25);
+  font-size: clamp(0.77rem, 1vw, 1rem);
+}
+
+
+.dropdown-menu {
+  border-radius: 15px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0;
+  border: none;
+  width: 100%;
+
+}
+.text-justify{
+    text-align: justify;
+}
+
+.dropdown-item {
+  font-weight: 500;
+  padding: 10px 20px;
+  transition: background-color 0.2s ease;
+  border-radius: 15px;
+}
+
+.dropdown-item:hover {
+  background-color: var(--secondary);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+  
+  /* ======== Responsividade ======== */
+  @media (max-width: 576px) {
+    .card-login {
+      padding: 1.25rem;
+    }
+  
+    .logo {
+      max-width: 60vw;
+    }
+  }

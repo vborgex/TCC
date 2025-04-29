@@ -3,7 +3,8 @@ import StartPage from "./pages/StartPage";
 import SignUpPage from "./pages/SignUp";
 import NavBar from "./utils";
 import LoginPage from "./pages/Login";
-import CreateEventPage from "./pages/CreateEventPage";
+import CreateProjectPage from "./pages/CreateProjectPage";
+import ProjectDetailsPage from "./pages/ProjectDetailsPage";
 function RoutesApp(){
     return (
         <BrowserRouter>
@@ -14,7 +15,8 @@ function RoutesApp(){
                 <Route path='/cadastro' element={<SignUpPage/>} />
                 <Route path='/login' element={<LoginPage/>}/>
                 <Route path='/navbar' element = {<NavBar/>}/>
-                <Route path='/createevent' element = {<CreateEventPage/>}/>
+                <Route path='/createProject' element = {<CreateProjectPage/>}/>
+                <Route path="/details" element={<ProjectDetailsPage/>}/>
                 {/* <Route path='*'  element={<Erro/>} /> */}
             </Routes>
         </BrowserRouter>
