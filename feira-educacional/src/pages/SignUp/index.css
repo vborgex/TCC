@@ -19,6 +19,9 @@
   font-size: clamp(0.95rem, 1vw, 1.1rem);
 }
 
+.text-danger{
+  font-size: small;
+}
 /* ======== Logo ======== */
 .logo {
   max-width: 300px;

@@ -1,7 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import { useNavigate } from "react-router-dom"; // Usando o useNavigate
+import { useNavigate } from "react-router-dom"; 
 import { AuthService } from "../../service/authService";
 import React, { useState } from "react";
 import "./index.css";
@@ -17,11 +17,11 @@ function SignUpPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    role: "",
-    general: "",
+    email: " ",
+    password: " ",
+    confirmPassword: " ",
+    role: " ",
+    general: " ",
   });
 
   const navigate = useNavigate();
@@ -81,11 +81,11 @@ function SignUpPage() {
   const onSubmit = async (e) => {
     e.preventDefault();
     setError({
-      email: "",
-      password: "",
-      confirmPassword: "",
-      role: "",
-      general: "",
+      email: " ",
+      password: " ",
+      confirmPassword: " ",
+      role: " ",
+      general: " ",
     });
     if (!email || !password || !confirmPassword) {
       setError((prev) => ({ ...prev, general: "Preencha todos os campos." }));
@@ -135,7 +135,7 @@ function SignUpPage() {
         />
         <form onSubmit={onSubmit}>
           <input
-            className="form-control mb-2"
+            className="form-control mb-1"
             placeholder="E-mail"
             type="email"
             value={email}
@@ -144,7 +144,7 @@ function SignUpPage() {
           />
           {error.email && <p className="text-danger">{error.email}</p>}
 
-          <div className="input-group mb-2">
+          <div className="input-group mb-1">
             <input
               type={showPassword ? "text" : "password"}
               className="form-control"
@@ -165,7 +165,7 @@ function SignUpPage() {
           </div>
           {error.password && <p className="text-danger">{error.password}</p>}
 
-          <div className="input-group mb-2">
+          <div className="input-group mb-1">
             <input
               type={showPasswordConfirmation ? "text" : "password"}
               className="form-control"
@@ -192,7 +192,7 @@ function SignUpPage() {
             <p className="text-danger">{error.confirmPassword}</p>
           )}
 
-          <div className="dropdown mb-2 align-items-center">
+          <div className="dropdown mb-1 align-items-center">
             <button
               className="btn btn-secondary dropdown-toggle"
               type="button"
