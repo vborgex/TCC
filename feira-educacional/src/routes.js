@@ -5,6 +5,7 @@ import NavBar from "./utils";
 import LoginPage from "./pages/Login";
 import CreateProjectPage from "./pages/CreateProjectPage";
 import ProjectDetailsPage from "./pages/ProjectDetailsPage";
+import EvaluationPage from "./pages/EvaluationPage";
 function RoutesApp(){
     return (
         <BrowserRouter>
@@ -17,6 +18,7 @@ function RoutesApp(){
                 <Route path='/navbar' element = {<NavBar/>}/>
                 <Route path='/createProject' element = {<CreateProjectPage/>}/>
                 <Route path="/details" element={<ProjectDetailsPage/>}/>
+                <Route path="/evaluate" element={<EvaluationPage/>}/>
                 {/* <Route path='*'  element={<Erro/>} /> */}
             </Routes>
         </BrowserRouter>
