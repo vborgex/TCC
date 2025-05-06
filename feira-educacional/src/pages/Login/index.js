@@ -1,8 +1,8 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import React from "react";
-import "./index.css";
-import logo from "../../assets/Logo.svg";
+import "./login.css";
+import logo from "../../assets/Logo2.svg";
 import { AuthService } from "../../service/authService";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState({
     email: "",
     password: "",
@@ -53,7 +54,7 @@ function LoginPage() {
     }
 
     try {
-      await AuthService.login(email, password);
+      await AuthService.login(email, password, rememberMe);
       navigate("/createProject");
     } catch (err) {
       switch (err.code) {
@@ -126,11 +127,11 @@ function LoginPage() {
             <input
               className="form-check-input"
               type="checkbox"
-              value=""
-              id="flexCheckDefault"
+              checked={rememberMe}
+              onChange={() => setRememberMe(!rememberMe)}
             />
             <label className="form-check-label" for="flexCheckDefault">
-              Lembrar de mim
+              Manter conectado
             </label>
           </div>
           <button className="btn btn-custom rounded-pill mb-2 w-100">

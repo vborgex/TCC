@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthService } from "../../service/authService";
 import React, { useState } from "react";
 import "./index.css";
-import logo from "../../assets/Logo.svg";
+import logo from "../../assets/Logo2.svg";
 
 function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);

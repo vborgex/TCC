@@ -1,47 +1,47 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import React, { useState } from "react";
+import React from "react";
 import "./index.css";
-import logo from "../../assets/Logo.svg";
 
 function EvaluationPage() {
+  const handleGradeBlur = (e) => {
+    let value = parseFloat(e.target.value);
+  
+    if (value < 0.1) value = 0.1;
+    if (value > 10) value = 10;
+  
+    e.target.value = value.toFixed(2);
+  };
+  
   return (
-    <div className="background d-flex align-items-center vh-100 p-2 justify-content-center  ">
-      <div className="card-create-project">
-        <div className="text-center text-uppercase">
-          <h2 id="eventName">Educatech</h2>
+    <div className="background d-flex min-vh-100 p-2 justify-content-center overflow-auto">
+      <div className="card-create-project p-10 w-100 max-w-900 mt-4 mb-4">
+        <div className="text-center">
+          <h2 id="eventName" className="text-uppercase">
+            Educatech
+          </h2>
+          <h5 id="projectName" className="">
+            Tecnologia para despoluição de Rios no interior do Paraná
+          </h5>
         </div>
+
         <div className="row justify-content-start align-items-end">
           <div className="col-lg-6 col-12 d-flex flex-column align-items-start">
             <label className="label mb-2">Caráter Científico</label>
-            <input
-              className="form-control mb-2 grade-input"
-              id="projectGrade"
-              placeholder="Nota"
-              type="number"
-              min="0.1"
-              max="10.0"
-              step="0.1"
-            />
-            <textarea
-              className="form-control mb-2"
-              id="projectGradeComment"
-              placeholder="Escreva uma descrição da nota."
-              rows="4"
-              maxLength="280"
-            ></textarea>
-          </div>
-          <div className="col-lg-6 col-12 d-flex flex-column align-items-start">
-            <label className="label mb-2">Caráter Científico</label>
-            <input
-              className="form-control mb-2 grade-input"
-              id="projectGrade"
-              placeholder="Nota"
-              type="number"
-              min="0.1"
-              max="10.0"
-              step="0.1"
-            />
+            <div className="input-group w-50">
+              <input
+                className="form-control mb-2"
+                id="projectGrade"
+                placeholder="Nota"
+                type="number"
+                min="0.1"
+                max="10.0"
+                step="0.1"
+                onBlur={handleGradeBlur}
+              />
+              <span class="input-group-text">/10.00</span>
+            </div>
+
             <textarea
               className="form-control mb-2"
               id="projectGradeComment"
@@ -51,6 +51,7 @@ function EvaluationPage() {
             ></textarea>
           </div>
 
+          
           <div className="col-12 d-flex flex-column align-items-start">
             <label className="label mb-2">Anexo do projeto</label>
             <button className="btn btn-custom btn-regulamento mb-2">
