@@ -1,13 +1,14 @@
-/* ======== Background ======== */
+
 .background {
-    background-image: url('../../assets/Background.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    height: 100vh;
-    width: 100%;
-  }
-  
+  background-image: url('../../assets/Background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
   #eventName{
     font-weight: bolder;
     color: var(--accent);

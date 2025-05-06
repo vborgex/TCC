@@ -19,8 +19,8 @@ function CreateProjectPage() {
   };
 
   return (
-    <div className="background d-flex align-items-center vh-100 p-2 justify-content-center">
-      <div className="card-create-project">
+    <div className="background d-flex min-vh-100 p-2 justify-content-center overflow-auto">
+      <div className="card-create-project p-10 w-100 max-w-900 mt-4 mb-4">
         <div className="text-center text-uppercase">
           <h2 id="eventName">Educatech</h2>
         </div>
