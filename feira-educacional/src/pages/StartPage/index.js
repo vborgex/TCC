@@ -1,7 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import React from "react";
 import "./index.css";
-import logo from "../../assets/Logo.svg";
+import logo from "../../assets/Logo2.svg";
 
 function StartPage() {
   return (
