@@ -27,7 +27,7 @@ function Navbar() {
       <div className="collapse navbar-collapse" id="navbarNavDropdown">
         <ul className="navbar-nav ms-auto">
           <li className="nav-item">
-            <a className="nav-link active" aria-current="page" href="#">
+            <a className="nav-link active" aria-current="page" href="/home">
               Início
             </a>
           </li>
@@ -47,15 +47,15 @@ function Navbar() {
               aria-labelledby="navbarDropdownMenuLink"
             >
               <li>
-                <a className="dropdown-item" href="#">
+                <a className="dropdown-item" href="">
                   <i className="bi bi-folder me-1"></i>
                   Meus projetos
                 </a>
               </li>
               <li>
-                <a className="dropdown-item" href="#">
+                <a className="dropdown-item" href="/createProject">
                   <i className="bi bi-file-earmark-plus me-1"></i>
-                  Criar evento
+                  Criar projeto
                 </a>
               </li>
             </ul>
