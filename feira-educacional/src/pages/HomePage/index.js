@@ -3,28 +3,31 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import React from "react";
 import "./index.css";
 import astronaut from "./../../assets/Astronaut2.svg";
-import NavBar from "./../../components/navbar"
+import NavBar from "./../../components/navbar";
 
 function HomePage() {
   return (
-    <div>
-      <NavBar/>
-    <div className="background-home container-fluid d-flex min-vh-100 justify-content-center overflow-auto">
-
-      <div className="row ">
-        <div className="col-md-6 col-12 d-flex flex-column justify-content-start align-items-start ps-5  m-0">
-          <h1 className="text-uppercase display-3" id="welcome">
-            Bem vinda,
-          </h1>
-          <h1 className="text-uppercase display-3" id="username">
-            Vanessa
-          </h1>
-        </div>
-        <div className="col-md-6 col-12 d-flex justify-content-center align-items-center p-0 m-0">
-          <img src={astronaut} className="mw-100 img-fluid object-fit-scale"></img>
+    <div className="background-home min-vh-100 overflow-auto p-0">
+      <NavBar />
+      <div className="container-fluid d-flex flex-column justify-content-between p-5 min-vh-100">
+        <div className="row flex-grow-1">
+          <div className="col-md-6 col-12 d-flex flex-column justify-content-start align-items-start ps-5 m-0">
+            <h1 className="text-uppercase display-3" id="welcome">
+              Bem vinda,
+            </h1>
+            <h1 className="text-uppercase display-3" id="username">
+              Vanessa
+            </h1>
+          </div>
+          <div className="col-md-6 col-12 d-flex align-items-center p-0 m-0 justify-content-lg-center justify-content-end">
+            <img
+              src={astronaut}
+              className="mw-100 img-fluid object-fit-scale"
+              alt="Astronaut"
+            />
+          </div>
         </div>
       </div>
-    </div>
     </div>
   );
 }

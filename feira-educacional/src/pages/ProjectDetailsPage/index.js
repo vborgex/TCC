@@ -6,10 +6,9 @@ import Navbar from "../../components/navbar";
 
 function ProjectDetailsPage() {
   return (
-    <div>
+    <div className="background min-vh-100 overflow-auto p-0">
       <Navbar />
-
-      <div className="background d-flex min-vh-100 p-2 justify-content-center overflow-auto">
+      <div className=" d-flex p-2 justify-content-center">
         <div className="card-create-project p-10 w-100 max-w-900 mt-4 mb-4">
           <div className="text-center text-uppercase">
             <h2 id="eventName">Educatech</h2>
