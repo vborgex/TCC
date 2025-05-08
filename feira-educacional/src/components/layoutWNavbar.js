@@ -3,10 +3,10 @@ import Navbar from './navbar';
 
 function LayoutComNavbar() {
   return (
-    <>
+    <div>
       <Navbar />
       <Outlet />
-    </>
+    </div>
   );
 }
 

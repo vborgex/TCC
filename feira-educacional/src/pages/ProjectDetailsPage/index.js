@@ -32,10 +32,10 @@ function ProjectDetailsPage() {
           </div>
 
           <div className="col-12 d-flex flex-column align-items-start">
-            <label className="label mb-2">Anexo do projeto</label>
+            <label className="label mb-2">Anexo da avaliação</label>
             <button className="btn btn-custom btn-regulamento mb-2">
               <i className="bi bi-file-earmark-arrow-down me-2"></i>
-              Baixar Anexo
+              Adicionar Anexo
             </button>
           </div>  
         </div>

@@ -9,8 +9,8 @@ import logo from "../assets/Logo2.svg";
 function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light px-5">
-      <a className="navbar-brand" href="#">
-        <img src={logo} alt="Logo" height="60" />
+      <a className="navbar-brand">
+        <img src={logo} alt="Logo" height="55" />
       </a>
       <button
         className="navbar-toggler border-0"
@@ -48,13 +48,13 @@ function Navbar() {
             >
               <li>
                 <a className="dropdown-item" href="#">
-                  <i class="bi bi-folder me-1"></i>
+                  <i className="bi bi-folder me-1"></i>
                   Meus projetos
                 </a>
               </li>
               <li>
                 <a className="dropdown-item" href="#">
-                  <i class="bi bi-file-earmark-plus me-1"></i>
+                  <i className="bi bi-file-earmark-plus me-1"></i>
                   Criar evento
                 </a>
               </li>
@@ -82,13 +82,13 @@ function Navbar() {
             >
               <li>
                 <a className="dropdown-item" href="#">
-                  <i class="bi bi-person-circle me-1"></i>
+                  <i className="bi bi-person-circle me-1"></i>
                   Meu Perfil
                 </a>
               </li>
               <li>
                 <a className="dropdown-item" href="#">
-                  <i class="bi bi-box-arrow-right me-1"></i>
+                  <i className="bi bi-box-arrow-right me-1"></i>
                   Sair
                 </a>
               </li>

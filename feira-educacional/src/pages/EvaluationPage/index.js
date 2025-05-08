@@ -30,13 +30,12 @@ function EvaluationPage() {
             <label className="label mb-2">Caráter Científico</label>
             <div className="input-group w-50">
               <input
-                className="form-control mb-2"
+                className="form-control mb-2 no-spinner"
                 id="projectGrade"
                 placeholder="Nota"
                 type="number"
                 min="0.1"
                 max="10.0"
-                step="0.1"
                 onBlur={handleGradeBlur}
               />
               <span class="input-group-text">/10.00</span>

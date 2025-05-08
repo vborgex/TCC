@@ -1,0 +1,31 @@
+#welcome{
+    color: var(--secondary);
+    font-weight: bolder;
+}
+
+#username{
+    color: var(--secondary);
+    font-weight: bolder;
+}
+
+body {
+    margin: 0; 
+    padding: 0;
+    overflow: hidden; 
+  }
+  
+  #username, #welcome {
+    margin: 0;
+    padding: 0; 
+  }
+
+  .background-home{
+    background-image: url('../../assets/Background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+  

@@ -6,6 +6,7 @@ import CreateProjectPage from './pages/CreateProjectPage';
 import ProjectDetailsPage from './pages/ProjectDetailsPage';
 import EvaluationPage from './pages/EvaluationPage';
 import LayoutWNavbar from "./components/layoutWNavbar";
+import HomePage from './pages/HomePage';
 
 function RoutesApp() {
   const usuarioAutenticado = true;
@@ -22,6 +23,7 @@ function RoutesApp() {
             <Route path="/createProject" element={<CreateProjectPage />} />
             <Route path="/details" element={<ProjectDetailsPage />} />
             <Route path="/evaluate" element={<EvaluationPage />} />
+            <Route path="/home" element={<HomePage/>}/>
           </Route>
         )}
       </Routes>
