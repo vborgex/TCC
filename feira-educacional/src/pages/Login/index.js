@@ -5,7 +5,9 @@ import "./login.css";
 import logo from "../../assets/Logo2.svg";
 import { AuthService } from "../../service/authService";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import store from "../../store/index";
 
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -18,6 +20,7 @@ function LoginPage() {
     general: "",
   });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const validateEmail = (value) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     setEmail(value);
@@ -44,9 +47,9 @@ function LoginPage() {
   const onSubmit = async (e) => {
     e.preventDefault();
     setError({
-      email: " ",
-      password: " ",
-      general: " ",
+      email: "",
+      password: "",
+      general: "",
     });
     if (!email || !password) {
       setError((prev) => ({ ...prev, general: "Preencha todos os campos." }));
@@ -55,7 +58,9 @@ function LoginPage() {
 
     try {
       await AuthService.login(email, password, rememberMe);
-      navigate("/createProject");
+      dispatch({ type: "LOG_IN", usuarioEmail: email });
+
+      navigate("/home");
     } catch (err) {
       switch (err.code) {
         case "auth/user-not-found":
@@ -88,6 +93,9 @@ function LoginPage() {
 
   return (
     <div className="background d-flex justify-content-center align-items-center vh-100 p-3">
+      {
+        useSelector(state => state.usuario.usuarioLogado) > 0 ? <Navigate to='/home'/> :null
+      }
       <div className="card-login">
         <img
           src={logo}
@@ -130,13 +138,12 @@ function LoginPage() {
               checked={rememberMe}
               onChange={() => setRememberMe(!rememberMe)}
             />
-            <label className="form-check-label" for="flexCheckDefault">
-              Manter conectado
-            </label>
+            <label className="form-check-label">Manter conectado</label>
           </div>
           <button className="btn btn-custom rounded-pill mb-2 w-100">
             Login
           </button>
+          <></>
         </form>
       </div>
     </div>

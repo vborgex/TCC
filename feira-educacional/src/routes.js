@@ -6,9 +6,12 @@ import CreateProjectPage from "./pages/CreateProjectPage";
 import ProjectDetailsPage from "./pages/ProjectDetailsPage";
 import EvaluationPage from "./pages/EvaluationPage";
 import HomePage from "./pages/HomePage";
+import store from '../src/store/'
+import { Provider } from "react-redux";
 
 function RoutesApp() {
   return (
+    <Provider store={store}>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<StartPage/>}/>
@@ -21,6 +24,7 @@ function RoutesApp() {
         <Route path="/home" element={<HomePage />} />
       </Routes>
     </BrowserRouter>
+    </Provider>
   );
 }
 
