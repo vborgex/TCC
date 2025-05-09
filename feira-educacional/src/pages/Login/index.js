@@ -5,9 +5,8 @@ import "./login.css";
 import logo from "../../assets/Logo2.svg";
 import { AuthService } from "../../service/authService";
 import { useState } from "react";
-import { useNavigate, Navigate } from "react-router-dom";
+import { useNavigate, Navigate, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import store from "../../store/index";
 
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -143,7 +142,7 @@ function LoginPage() {
           <button className="btn btn-custom rounded-pill mb-2 w-100">
             Login
           </button>
-          <></>
+          <Link className="forgot-password fs-6 fw-semibold" to="/forgotPassword">Esqueci minha senha</Link>
         </form>
       </div>
     </div>
