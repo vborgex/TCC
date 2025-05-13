@@ -13,6 +13,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState({
     email: "",
     password: "",
@@ -54,13 +55,14 @@ function LoginPage() {
       setError((prev) => ({ ...prev, general: "Preencha todos os campos." }));
       return;
     }
-
+    setIsSubmitting(true);
     try {
       await AuthService.login(email, password, rememberMe);
       dispatch({ type: "LOG_IN", usuarioEmail: email });
 
       navigate("/home");
     } catch (err) {
+      setIsSubmitting(false);
       switch (err.code) {
         case "auth/user-not-found":
           setError((prev) => ({ ...prev, email: "E-mail não cadastrado." }));
@@ -108,6 +110,7 @@ function LoginPage() {
             value={email}
             onChange={(e) => validateEmail(e.target.value)}
             required
+            disabled={isSubmitting}
           />
           {error.email && <p className="text-danger">{error.email}</p>}
           <div className="input-group mb-2">
@@ -118,11 +121,13 @@ function LoginPage() {
               value={password}
               onChange={(e) => validatePassword(e.target.value)}
               required
+              disabled={isSubmitting}
             />
             <button
               className="btn-icon-only"
               type="button"
               onClick={() => setShowPassword(!showPassword)}
+              disabled={isSubmitting}
             >
               <i
                 className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}
@@ -136,10 +141,12 @@ function LoginPage() {
               type="checkbox"
               checked={rememberMe}
               onChange={() => setRememberMe(!rememberMe)}
+              disabled={isSubmitting}
             />
             <label className="form-check-label">Manter conectado</label>
           </div>
-          <button className="btn btn-custom rounded-pill mb-2 w-100">
+          <button className="btn btn-custom rounded-pill mb-2 w-100"
+          disabled={isSubmitting}>
             Login
           </button>
           <Link className="forgot-password fs-6 fw-semibold" to="/forgotPassword">Esqueci minha senha</Link>

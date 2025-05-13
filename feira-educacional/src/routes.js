@@ -23,7 +23,7 @@ function RoutesApp() {
         <Route path="/details" element={<ProjectDetailsPage />} />
         <Route path="/evaluate" element={<EvaluationPage />} />
         <Route path="/home" element={<HomePage />} />
-        <Route path="/forgotPassword" element={<ForgotPasswordPage />} />        
+        <Route path="/forgotPassword" element={<ForgotPasswordPage />} />       
       </Routes>
     </BrowserRouter>
     </Provider>

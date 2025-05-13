@@ -59,6 +59,14 @@
   border: 2.5px solid var(--primary);
 }
 
+.btn-custom:disabled {
+  background-color: var(--background);
+  color: var(--primary);
+  border: 2.5px solid var(--primary);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 /* ======== Inputs ======== */
 .form-control {
   font-size: clamp(1rem, 1.2vw, 1.2rem);
@@ -66,6 +74,15 @@
   border: 2.5px solid var(--accent);
   border-radius: 0.8rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+
+.form-control:disabled {
+  background-color: var(--background);
+  border: 2.5px solid var(--accent); 
+  color: var(--text); 
+  cursor: not-allowed;
+  opacity: 0.6; 
 }
 
 .form-control:focus {
@@ -120,6 +137,7 @@
 .forgot-password{
   color: var(--accent2);
 }
+
 
 /* ======== Responsividade ======== */
 @media (max-width: 576px) {
