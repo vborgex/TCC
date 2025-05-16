@@ -39,7 +39,7 @@ function Navbar() {
                   Início
                 </a>
               </li>
-              {!role ? (
+              {role === "Orientador" ? (
                 <li className="nav-item dropdown">
                   <a
                     className="nav-link dropdown-toggle"
@@ -117,7 +117,7 @@ function Navbar() {
             </>
           ) : (
             <li className="nav-item">
-              <a className="nav-link" aria-current="page" href="/login">
+              <a className="nav-link" aria-current="page" href="/start">
                 Login
               </a>
             </li>
