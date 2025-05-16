@@ -1,15 +1,18 @@
 import { db, auth } from "./../config/firebase";
 import { collection, addDoc, doc, getDoc } from "firebase/firestore";
 export const dbService = {
-  async createProject(user, title, description, educationLevel, category) {
+  async createProject(title, description, educationLevel, category) {
     try {
-      await addDoc(collection(db, "projetos"), {
-        user,
-        title,
-        description,
-        educationLevel,
-        category,
-      });
+      const user = auth.currentUser;
+      const projectRef = collection(db, "users", user.uid, "projects");
+      const newProject = {
+        title:title,
+        description:description,
+        educationLevel:educationLevel,
+        category:category
+      };
+      await addDoc(projectRef, newProject);
+
     } catch (error) {
       throw error;
     }
