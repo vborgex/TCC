@@ -1,22 +1,25 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate, Navigate } from "react-router-dom";
 import { AuthService } from "../../service/authService";
 import React, { useState } from "react";
 import "./index.css";
 import logo from "../../assets/Logo2.svg";
+import { useSelector } from "react-redux";
 
 function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirmation, setShowPasswordConfirmation] =
     useState(false);
   const [selectedRole, setSelectedRole] = useState("Escolha uma opção");
-
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState({
+    name: " ",
     email: " ",
     password: " ",
     confirmPassword: " ",
@@ -28,10 +31,25 @@ function SignUpPage() {
 
   const handleRoleSelect = (role) => {
     setSelectedRole(role);
-    if (role === "Escolha uma opção") {
-      setError((prev) => ({ ...prev, role: "Selecionar campo." }));
+    setError ((prev) => ({...prev, role: " "}));
+  };
+
+  const validateName = (value) => {
+    setName(value);
+    const nameRegex = /^[A-Za-zÀ-ÿ\s]+$/;
+    const nameParts = value.trim().split(" ");
+    if (nameParts.length < 2) {
+      setError((prev) => ({
+        ...prev,
+        name: "Por favor, insira seu nome completo.",
+      }));
+    } else if (!nameRegex.test(value)) {
+      setError((prev) => ({
+        ...prev,
+        name: "O nome não deve conter números.",
+      }));
     } else {
-      setError((prev) => ({ ...prev, role: "" }));
+      setError((prev) => ({ ...prev, name: " " }));
     }
   };
 
@@ -44,7 +62,7 @@ function SignUpPage() {
     } else if (!emailRegex.test(value)) {
       setError((prev) => ({ ...prev, email: "Email inválido." }));
     } else {
-      setError((prev) => ({ ...prev, email: "" }));
+      setError((prev) => ({ ...prev, email: " " }));
     }
   };
 
@@ -62,7 +80,8 @@ function SignUpPage() {
         password: "A senha deve ter pelo menos 6 caracteres.",
       }));
     } else {
-      setError((prev) => ({ ...prev, password: "" }));
+      setError((prev) => ({ ...prev, password: " " }));
+      validateConfirmPassword(confirmPassword);
     }
   };
 
@@ -74,20 +93,22 @@ function SignUpPage() {
         confirmPassword: "As senhas são incompatíveis.",
       }));
     } else {
-      setError((prev) => ({ ...prev, confirmPassword: "" }));
+      setError((prev) => ({ ...prev, confirmPassword: " " }));
     }
   };
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setError({
+      name: " ",
       email: " ",
       password: " ",
       confirmPassword: " ",
       role: " ",
       general: " ",
     });
-    if (!email || !password || !confirmPassword) {
+
+    if (!email || !password || !confirmPassword || !name) {
       setError((prev) => ({ ...prev, general: "Preencha todos os campos." }));
       return;
     }
@@ -105,10 +126,13 @@ function SignUpPage() {
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
-      await AuthService.register(email, password, selectedRole);
+      await AuthService.register(email, password, selectedRole, name);
       navigate("/login");
     } catch (err) {
+      setIsSubmitting(false); 
       switch (err.code) {
         case "auth/invalid-email":
           setError((prev) => ({ ...prev, email: "Email inválido." }));
@@ -127,6 +151,9 @@ function SignUpPage() {
 
   return (
     <div className="background d-flex justify-content-center align-items-center vh-100 p-3">
+      {useSelector((state) => state.usuario.usuarioLogado) > 0 ? (
+        <Navigate to="/home" />
+      ) : null}
       <div className="card-login text-center">
         <img
           src={logo}
@@ -136,11 +163,21 @@ function SignUpPage() {
         <form onSubmit={onSubmit}>
           <input
             className="form-control mb-1"
+            placeholder="Nome completo"
+            value={name}
+            onChange={(e) => validateName(e.target.value)}
+            required
+            disabled={isSubmitting}
+          />
+          {error.name && <p className="text-danger">{error.name}</p>}
+          <input
+            className="form-control mb-1"
             placeholder="E-mail"
             type="email"
             value={email}
             onChange={(e) => validateEmail(e.target.value)}
             required
+            disabled={isSubmitting}
           />
           {error.email && <p className="text-danger">{error.email}</p>}
 
@@ -152,6 +189,7 @@ function SignUpPage() {
               value={password}
               onChange={(e) => validatePassword(e.target.value)}
               required
+              disabled={isSubmitting}
             />
             <button
               className="btn-icon-only"
@@ -173,6 +211,7 @@ function SignUpPage() {
               value={confirmPassword}
               onChange={(e) => validateConfirmPassword(e.target.value)}
               required
+              disabled={isSubmitting}
             />
             <button
               className="btn-icon-only"
@@ -192,13 +231,14 @@ function SignUpPage() {
             <p className="text-danger">{error.confirmPassword}</p>
           )}
 
-          <div className="dropdown mb-1 align-items-center">
+          <div className="dropdown align-items-center">
             <button
-              className="btn btn-secondary dropdown-toggle"
+              className="btn btn-secondary dropdown-toggle "
               type="button"
               id="dropdownMenuButton"
               data-bs-toggle="dropdown"
               aria-expanded="false"
+              disabled={isSubmitting}
             >
               {selectedRole}
             </button>
@@ -237,6 +277,7 @@ function SignUpPage() {
           <button
             className="btn btn-custom rounded-pill mb-3 w-100"
             type="submit"
+            disabled={isSubmitting}
           >
             Cadastrar
           </button>

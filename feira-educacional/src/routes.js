@@ -6,16 +6,15 @@ import CreateProjectPage from "./pages/CreateProjectPage";
 import ProjectDetailsPage from "./pages/ProjectDetailsPage";
 import EvaluationPage from "./pages/EvaluationPage";
 import HomePage from "./pages/HomePage";
-import store from '../src/store/'
+import store from "../src/store/";
 import { Provider } from "react-redux";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 
 function RoutesApp() {
   return (
-    <Provider store={store}>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<StartPage/>}/>
+        <Route path="/" element={<StartPage />} />
         <Route path="/start" element={<StartPage />} />
         <Route path="/register" element={<SignUpPage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -23,10 +22,9 @@ function RoutesApp() {
         <Route path="/details" element={<ProjectDetailsPage />} />
         <Route path="/evaluate" element={<EvaluationPage />} />
         <Route path="/home" element={<HomePage />} />
-        <Route path="/forgotPassword" element={<ForgotPasswordPage />} />       
+        <Route path="/forgotPassword" element={<ForgotPasswordPage />} />
       </Routes>
     </BrowserRouter>
-    </Provider>
   );
 }
 

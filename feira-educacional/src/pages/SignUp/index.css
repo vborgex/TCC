@@ -19,9 +19,10 @@
   font-size: clamp(0.95rem, 1vw, 1.1rem);
 }
 
-.text-danger{
+.text-danger {
   font-size: small;
 }
+
 /* ======== Logo ======== */
 .logo {
   max-width: 300px;
@@ -123,17 +124,21 @@
 /* ======== Dropdown ========*/
 
 #dropdownMenuButton {
-  background-color: var(--background); /* roxinho */
+  background-color: var(--background);
+  /* roxinho */
   color: var(--accent);
   border: none;
   border-radius: 20px;
-  padding: 10px 20px;
   font-weight: bold;
   transition: background-color 0.3s ease;
   width: 100%;
   box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.25);
 }
 
+.dropdown {
+  margin-bottom: 1rem;
+  /* Ajuste conforme necessário */
+}
 
 .dropdown-menu {
   border-radius: 15px;

@@ -59,7 +59,6 @@ function LoginPage() {
     try {
       await AuthService.login(email, password, rememberMe);
       dispatch({ type: "LOG_IN", usuarioEmail: email });
-
       navigate("/home");
     } catch (err) {
       setIsSubmitting(false);
