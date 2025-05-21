@@ -10,9 +10,8 @@ import { useSelector } from "react-redux";
 
 function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirmation, setShowPasswordConfirmation] =
-    useState(false);
-  const [selectedRole, setSelectedRole] = useState("Escolha uma opção");
+  const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
+  const [selectedRole, setSelectedRole] = useState(""); 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,11 +26,17 @@ function SignUpPage() {
     general: " ",
   });
 
+  const roles = {
+    ALUNO: "Aluno",
+    ORIENTADOR: "Orientador",
+    AVALIADOR: "Avaliador",
+    ORGANIZADOR: "Organizador",
+  };
   const navigate = useNavigate();
 
-  const handleRoleSelect = (role) => {
-    setSelectedRole(role);
-    setError ((prev) => ({...prev, role: " "}));
+  const handleRoleSelect = (roleKey) => {
+    setSelectedRole(roleKey);
+    setError((prev) => ({ ...prev, role: " " }));
   };
 
   const validateName = (value) => {
@@ -121,7 +126,7 @@ function SignUpPage() {
       return;
     }
 
-    if (selectedRole === "Escolha uma opção") {
+    if (!selectedRole) {
       setError((prev) => ({ ...prev, role: "Selecione uma opção." }));
       return;
     }
@@ -132,7 +137,7 @@ function SignUpPage() {
       await AuthService.register(email, password, selectedRole, name);
       navigate("/login");
     } catch (err) {
-      setIsSubmitting(false); 
+      setIsSubmitting(false);
       switch (err.code) {
         case "auth/invalid-email":
           setError((prev) => ({ ...prev, email: "Email inválido." }));
@@ -233,43 +238,28 @@ function SignUpPage() {
 
           <div className="dropdown align-items-center">
             <button
-              className="btn btn-secondary dropdown-toggle "
+              className="btn btn-secondary dropdown-toggle"
               type="button"
               id="dropdownMenuButton"
               data-bs-toggle="dropdown"
               aria-expanded="false"
               disabled={isSubmitting}
             >
-              {selectedRole}
+              {selectedRole ? roles[selectedRole] : "Escolha uma opção"}
             </button>
+
             <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <li>
-                <button
-                  className="dropdown-item"
-                  type="button"
-                  onClick={() => handleRoleSelect("Orientador")}
-                >
-                  Orientador
-                </button>
-              </li>
-              <li>
-                <button
-                  className="dropdown-item"
-                  type="button"
-                  onClick={() => handleRoleSelect("Administrador")}
-                >
-                  Administrador
-                </button>
-              </li>
-              <li>
-                <button
-                  className="dropdown-item"
-                  type="button"
-                  onClick={() => handleRoleSelect("Aluno")}
-                >
-                  Aluno
-                </button>
-              </li>
+              {Object.entries(roles).map(([key, label]) => (
+                <li key={key}>
+                  <button
+                    className="dropdown-item"
+                    type="button"
+                    onClick={() => handleRoleSelect(key)}
+                  >
+                    {label}
+                  </button>
+                </li>
+              ))}
             </ul>
           </div>
           {error.role && <p className="text-danger">{error.role}</p>}

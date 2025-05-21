@@ -23,7 +23,7 @@
     return (
       <div className="background min-vh-100 overflow-auto p-0">
         <Navbar/>
-        <div className="d-flex justify-content-center">
+        <div className="d-flex p-2 justify-content-center">
           <div className="card-create-project p-10 w-100 max-w-900 mt-4 mb-4">
             <div className="text-center">
               <h2 id="eventName" className="text-uppercase">
@@ -47,7 +47,7 @@
                     max="10.0"
                     onBlur={handleGradeBlur}
                   />
-                  <span class="input-group-text">/10.00</span>
+                  <span className="input-group-text">/10.00</span>
                 </div>
 
                 <textarea
@@ -70,7 +70,7 @@
                     max="10.0"
                     onBlur={handleGradeBlur}
                   />
-                  <span class="input-group-text">/10.00</span>
+                  <span className="input-group-text">/10.00</span>
                 </div>
 
                 <textarea
@@ -93,7 +93,7 @@
                     max="10.0"
                     onBlur={handleGradeBlur}
                   />
-                  <span class="input-group-text">/10.00</span>
+                  <span className="input-group-text">/10.00</span>
                 </div>
 
                 <textarea
@@ -116,7 +116,7 @@
                     max="10.0"
                     onBlur={handleGradeBlur}
                   />
-                  <span class="input-group-text">/10.00</span>
+                  <span className="input-group-text">/10.00</span>
                 </div>
 
                 <textarea
@@ -139,7 +139,7 @@
                     max="10.0"
                     onBlur={handleGradeBlur}
                   />
-                  <span class="input-group-text">/10.00</span>
+                  <span className="input-group-text">/10.00</span>
                 </div>
 
                 <textarea

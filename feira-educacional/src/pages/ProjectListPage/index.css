@@ -1,0 +1,10 @@
+#title {
+  font-weight: bolder;
+  color: var(--accent);
+}
+
+.list-group {
+  border-radius: 12px;
+  border: none;
+  background-color: none;
+}

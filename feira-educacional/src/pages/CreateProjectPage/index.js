@@ -25,6 +25,7 @@ function CreateProjectPage() {
     educationLevel: "",
     general: "",
   });
+  
   const navigate = useNavigate();
   const usuarioEmail = useSelector((state) => state.usuario.usuarioEmail);
   console.log(usuarioEmail)
@@ -75,7 +76,7 @@ function CreateProjectPage() {
       return;
     }
     try {
-      await dbService.createProject(usuarioEmail, title, description, selectedCategory, selectedEducationLevel, selectedFile);
+      await dbService.createProject(title, description, selectedEducationLevel,  selectedCategory, selectedFile);
       navigate("/home");
       
     } catch(err) {

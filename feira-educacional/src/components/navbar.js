@@ -39,7 +39,7 @@ function Navbar() {
                   Início
                 </a>
               </li>
-              {role === "Orientador" ? (
+              {role === "ORIENTADOR" ? (
                 <li className="nav-item dropdown">
                   <a
                     className="nav-link dropdown-toggle"
@@ -56,7 +56,7 @@ function Navbar() {
                     aria-labelledby="navbarDropdownMenuLink"
                   >
                     <li>
-                      <a className="dropdown-item" href="">
+                      <a className="dropdown-item" href="/projectList">
                         <i className="bi bi-folder me-1"></i>
                         Meus projetos
                       </a>
@@ -71,6 +71,16 @@ function Navbar() {
                 </li>
               ) : (
                 <></>
+              )}
+              {role==="AVALIADOR" ? (
+                <li className="nav-item">
+                <a className="nav-link" href="#">
+                  Eventos
+                </a>
+              </li>
+              ):(
+              <></>
+
               )}
               <li className="nav-item">
                 <a className="nav-link" href="#">

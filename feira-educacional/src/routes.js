@@ -9,6 +9,7 @@ import HomePage from "./pages/HomePage";
 import store from "../src/store/";
 import { Provider } from "react-redux";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ProjectListPage from "./pages/ProjectListPage";
 
 function RoutesApp() {
   return (
@@ -23,6 +24,7 @@ function RoutesApp() {
         <Route path="/evaluate" element={<EvaluationPage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/forgotPassword" element={<ForgotPasswordPage />} />
+        <Route path="/projectList" element={<ProjectListPage/>}/>
       </Routes>
     </BrowserRouter>
   );
