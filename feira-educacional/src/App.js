@@ -1,12 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import RoutesApp from "./routes";
-import { AuthService } from "./service/authService";
 import { dbService } from "./service/dbService";
+import Loading from "./components/loading";
 
 function App() {
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const auth = getAuth();
@@ -22,10 +23,16 @@ function App() {
       } else {
         dispatch({ type: "LOG_OUT" });
       }
+
+      setIsLoading(false);
     });
 
     return () => unsubscribe();
   }, [dispatch]);
+
+  if (isLoading) {
+    return <Loading/>;
+  }
 
   return <RoutesApp />;
 }

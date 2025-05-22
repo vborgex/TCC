@@ -2,7 +2,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { AuthService } from "./../service/authService";
-import React from "react";
 import "./Navbar.css";
 import logo from "../assets/Logo2.svg";
 import { useSelector, useDispatch } from "react-redux";
@@ -35,37 +34,36 @@ function Navbar() {
           {isLoggedIn ? (
             <>
               <li className="nav-item">
-                <a className="nav-link" aria-current="page" href="/home">
+                <Link to="/home" className="nav-link" aria-current="page">
                   Início
-                </a>
+                </Link>
               </li>
               {role === "ORIENTADOR" ? (
                 <li className="nav-item dropdown">
-                  <a
+                  <Link to="/"
                     className="nav-link dropdown-toggle"
-                    href="#"
                     id="navbarDropdownMenuLink"
                     role="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
                     Eventos
-                  </a>
+                  </Link>
                   <ul
                     className="dropdown-menu"
                     aria-labelledby="navbarDropdownMenuLink"
                   >
                     <li>
-                      <a className="dropdown-item" href="/projectList">
+                      <Link to="/projectList" className="dropdown-item">
                         <i className="bi bi-folder me-1"></i>
                         Meus projetos
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="/createProject">
+                      <Link to="/createProject" className="dropdown-item" >
                         <i className="bi bi-file-earmark-plus me-1"></i>
                         Criar projeto
-                      </a>
+                      </Link>
                     </li>
                   </ul>
                 </li>
@@ -74,39 +72,38 @@ function Navbar() {
               )}
               {role==="AVALIADOR" ? (
                 <li className="nav-item">
-                <a className="nav-link" href="#">
+                <Link to="" className="nav-link">
                   Eventos
-                </a>
+                </Link>
               </li>
               ):(
               <></>
 
               )}
               <li className="nav-item">
-                <a className="nav-link" href="#">
+                <Link to="" className="nav-link">
                   Notificações
-                </a>
+                </Link>
               </li>
               <li className="nav-item dropdown">
-                <a
+                <Link to=""
                   className="nav-link dropdown-toggle"
-                  href="#"
                   id="navbarDropdownMenuLink"
                   role="button"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
                   Minha conta
-                </a>
+                </Link>
                 <ul
                   className="dropdown-menu"
                   aria-labelledby="navbarDropdownMenuLink"
                 >
                   <li>
-                    <a className="dropdown-item" href="#">
+                    <Link to="" className="dropdown-item">
                       <i className="bi bi-person-circle me-1"></i>
                       Meu Perfil
-                    </a>
+                    </Link>
                   </li>
                   <Link
                     className="dropdown-item"
@@ -127,9 +124,9 @@ function Navbar() {
             </>
           ) : (
             <li className="nav-item">
-              <a className="nav-link" aria-current="page" href="/start">
+              <Link to="/start" className="nav-link" aria-current="page">
                 Login
-              </a>
+              </Link>
             </li>
           )}
         </ul>

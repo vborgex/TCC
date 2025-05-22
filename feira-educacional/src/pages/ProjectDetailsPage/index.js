@@ -1,10 +1,29 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./../ProjectDetailsPage/details.css";
 import Navbar from "../../components/navbar";
+import { useSelector } from "react-redux";
+import { dbService } from "../../service/dbService";
+import { useParams } from "react-router-dom";
 
-function ProjectDetailsPage() {
+function ProjectDetailsPage(props) {
+  const { id } = useParams();
+  const role = useSelector((state) => state.usuario.usuarioRole);
+  const [project, setProject] = useState({});
+
+  useEffect(() => {
+    async function fetchProject() {
+      try {
+        const resultado = await dbService.getProjectData(id);
+        setProject(resultado);
+      } catch (error) {
+        console.error("Erro ao buscar projeto:", error);
+      }
+    }
+
+    fetchProject();
+  }, [id]);
   return (
     <div className="background min-vh-100 overflow-auto p-0">
       <Navbar />
@@ -14,15 +33,19 @@ function ProjectDetailsPage() {
             <h2 id="eventName">Educatech</h2>
           </div>
           <div className="row justify-content-start align-items-end">
-            <div className="col-lg-6 col-12 d-flex flex-column align-items-start">
+            <div className="col-12 d-flex flex-column align-items-start">
               <label className="label mb-2">Nome do projeto</label>
-              <h>Aqui o nominhooo</h>
+              <h>{project?.title ?? "Carregando..."}</h>
             </div>
             <div className="col-lg-6 col-12 d-flex flex-column align-items-start">
               <label className="label mb-2">Categoria</label>
-              <h>Pensamento Computacional</h>
+              <h>{project?.category ?? "Carregando..."}</h>
             </div>
             <div className="col-lg-6 col-12 d-flex flex-column align-items-start">
+              <label className="label mb-2">Nivel de escolaridade</label>
+              <h>{project?.educationLevel ?? "Carregando..."}</h>
+            </div>
+            {/* <div className="col-lg-6 col-12 d-flex flex-column align-items-start">
               <label className="label mb-2">Alunos</label>
               <ul>
                 <li>
@@ -32,17 +55,11 @@ function ProjectDetailsPage() {
                   <h>Pensamento Computacional</h>
                 </li>
               </ul>
-            </div>
+            </div> */}
             <div className="col-12 d-flex flex-column align-items-start">
               <label className="label mb-2">Resumo do projeto</label>
               <p className="text-justify">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-                faucibus feugiat erat, vel condimentum neque ultrices luctus.
-                Curabitur dignissim diam ut urna sagittis tempor. Donec a velit
-                sodales, iaculis dolor in, elementum lacus. Morbi semper justo
-                eu sapien scelerisque, eget maximus nibh accumsan. Duis
-                consectetur orci a eleifend consequat. Duis a tortor lorem. Cras
-                id massa lectus.
+                {project?.description ?? "Carregando..."}
               </p>
             </div>
 
@@ -53,6 +70,16 @@ function ProjectDetailsPage() {
                 Adicionar Anexo
               </button>
             </div>
+            {role === "AVALIADOR" ? (
+              <div className="col-12 d-flex flex-column align-items-start">
+                <button className="btn btn-custom btn-regulamento mb-2">
+                  <i className="bi bi-stars me-2"></i>
+                  Avaliar
+                </button>
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
         </div>
       </div>

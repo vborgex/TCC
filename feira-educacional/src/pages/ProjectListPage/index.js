@@ -2,30 +2,21 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./index.css";
 import Navbar from "../../components/navbar";
-import ProjectCard from "../../components/ProjectCard";
 import { useState, useEffect } from "react";
 import { dbService } from "./../../service/dbService";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./../../config/firebase";
+import astronaut from "./../../assets/Astronaut3.svg";
+import ProjectCard from "../../components/projectCard";
 
 function ProjectListPage() {
   const [projetos, setProjetos] = useState([]);
-  let listaProjetos = [];
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
           const resultado = await dbService.getProjects();
-
-          const listaProjetos = [];
-          resultado.forEach((doc) => {
-            listaProjetos.push({
-              id: doc.id,
-              ...doc.data(),
-            });
-          });
-          console.log("Projetos:", listaProjetos);
-          setProjetos(listaProjetos);
+          setProjetos(resultado);
         } catch (error) {
           console.error("Erro ao buscar projetos:", error);
         }
@@ -47,12 +38,22 @@ function ProjectListPage() {
               Meus projetos
             </h2>
           </div>
-
-          <div className="list-group">
-            {projetos.map((item) => (
-              <ProjectCard titulo={item.title} status={"ok"} />
-            ))}
-          </div>
+          {projetos.length === 0 ? (
+            <div className="d-flex flex-column justify-content-center align-items-center">
+              <h5>Você ainda não possui nenhum projeto!</h5>
+              <img
+                src={astronaut}
+                className="align-self-center w-50 h-auto"
+                alt="..."
+              />
+            </div>
+          ) : (
+            <div className="list-group">
+              {projetos.map((item) => (
+                <ProjectCard id={item.id} titulo={item.title} status={"ok"} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

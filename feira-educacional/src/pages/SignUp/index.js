@@ -1,12 +1,11 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import { useNavigate, Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AuthService } from "../../service/authService";
 import React, { useState } from "react";
 import "./index.css";
 import logo from "../../assets/Logo2.svg";
-import { useSelector } from "react-redux";
 
 function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -156,9 +155,6 @@ function SignUpPage() {
 
   return (
     <div className="background d-flex justify-content-center align-items-center vh-100 p-3">
-      {useSelector((state) => state.usuario.usuarioLogado) > 0 ? (
-        <Navigate to="/home" />
-      ) : null}
       <div className="card-login text-center">
         <img
           src={logo}

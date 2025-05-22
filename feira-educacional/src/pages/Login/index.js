@@ -5,8 +5,8 @@ import "./login.css";
 import logo from "../../assets/Logo2.svg";
 import { AuthService } from "../../service/authService";
 import { useState } from "react";
-import { useNavigate, Navigate, Link } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useNavigate, Link } from "react-router-dom";
+import {useDispatch } from "react-redux";
 
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -93,9 +93,6 @@ function LoginPage() {
 
   return (
     <div className="background d-flex justify-content-center align-items-center vh-100 p-3">
-      {
-        useSelector(state => state.usuario.usuarioLogado) > 0 ? <Navigate to='/home'/> :null
-      }
       <div className="card-login">
         <img
           src={logo}
