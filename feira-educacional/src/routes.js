@@ -30,7 +30,7 @@ function RoutesApp() {
           <Route path="/projectList" element={<ProjectListPage />} />
         </Route>
         <Route element={<ProtectedRoute allowedRoutes={["AVALIADOR"]} />}>
-          <Route path="/evaluate" element={<EvaluationPage />} />
+          <Route path="/evaluate/:id" element={<EvaluationPage />} />
         </Route>
 
       </Routes>

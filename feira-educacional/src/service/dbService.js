@@ -51,7 +51,6 @@ export const dbService = {
       throw error;
     }
   },
-
   async getUserData() {
     try {
       const user = auth.currentUser;
