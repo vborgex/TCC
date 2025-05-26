@@ -12,3 +12,16 @@
     font-weight: 500;
 
 }
+.card-text{
+    height: 100px;
+}
+.card{
+    background-color: var(--secondary);
+    color: var(--primary);
+    border-radius: 1rem;
+    border: none;
+}
+.card:hover{
+    transform: scale(1.02);
+    
+}

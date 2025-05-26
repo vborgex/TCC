@@ -4,17 +4,18 @@ import React from "react";
 import "./projectCard.css";
 import { Link } from "react-router-dom";
 
-function ProjectCard({id, titulo, status }) {
+function ProjectCard({id, titulo, status, description }) {
   return (
-    <div className="list-group-item d-flex justify-content-between align-items-center flex-wrap m-1">
-      <Link to={'/details/'+id}>
-        <span id="projectTitle" className="project-title text-truncate">
+    <div className="div col-md-3 col-sm-12  p-1">
+      <Link to={'/details/'+id} className="card card-body text-decoration-none">
+        <h5 id="projectTitle" className="project-title text-truncate">
           {titulo}
-        </span>
-      </Link>
-      <Link to="">
+        </h5>
+        <p className="card-text text-justify text-body-secondary overflow-hidden">{description}</p>
         <span id="projectStatus">{status}</span>
+
       </Link>
+          
     </div>
   );
 }

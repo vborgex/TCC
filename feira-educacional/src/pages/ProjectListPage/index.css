@@ -1,6 +1,6 @@
-#title {
+#title-white{
   font-weight: bolder;
-  color: var(--accent);
+  color: var(--secondary);
 }
 
 .list-group {

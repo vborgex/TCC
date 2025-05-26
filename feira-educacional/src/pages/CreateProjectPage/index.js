@@ -101,6 +101,7 @@ function CreateProjectPage() {
                   id="projectName"
                   placeholder="Nome do projeto"
                   onChange={(e) => setTitle(e.target.value)}
+                  maxLength="100"
                 />
                 {error.title && <p className="text-danger">{error.title}</p>}
               </div>

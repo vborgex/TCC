@@ -6,7 +6,7 @@ import Navbar from "../../components/navbar";
 import { useSelector } from "react-redux";
 import { dbService } from "../../service/dbService";
 import { Link, useParams } from "react-router-dom";
-import astronaut from "./../../assets/Astronaut3.svg"
+import astronaut from "./../../assets/Astronaut3.svg";
 
 function ProjectDetailsPage() {
   const { id } = useParams();
@@ -74,24 +74,37 @@ function ProjectDetailsPage() {
                 <label className="label mb-2">Resumo do projeto</label>
                 <p className="text-justify">{project.description}</p>
               </div>
-              <div className="col-12 d-flex flex-column align-items-start">
-                <label className="label mb-2">Anexo da avaliação</label>
-                <button className="btn btn-custom btn-regulamento mb-2">
-                  <i className="bi bi-file-earmark-arrow-down me-2"></i>
-                  Adicionar Anexo
-                </button>
-              </div>
+
               {role === "AVALIADOR" && (
-                <div className="col-12 d-flex flex-column align-items-start">
-                  <Link
-                    to={`/evaluate/${id}`}
-                    className="btn btn-custom btn-regulamento mb-2"
-                  >
-                    <i className="bi bi-stars me-2"></i>
-                    Avaliar
-                  </Link>
-                </div>
+                <>
+                  <div className="col-12 d-flex flex-column align-items-start">
+                    <label className="label mb-2">Anexo do projeto</label>
+                    <button className="btn btn-custom btn-regulamento mb-2">
+                      <i className="bi bi-file-earmark-arrow-down me-2"></i>
+                      Baixar Anexo
+                    </button>
+                  </div>
+                  <div className="col-12 d-flex flex-column align-items-start">
+                    <label className="label mb-2">Avaliar o projeto</label>
+                    <Link
+                      to={`/evaluate/${id}`}
+                      className="btn btn-custom btn-regulamento mb-2"
+                    >
+                      <i className="bi bi-stars me-2"></i>
+                      Avaliar
+                    </Link>
+                  </div>
+                </>
               )}
+              {role === "ORIENTADOR" && (
+                  <div className="col-12 d-flex flex-column align-items-start">
+                    <label className="label mb-2">Anexo do projeto</label>
+                    <button className="btn btn-custom btn-regulamento mb-2">
+                      <i className="bi bi-file-earmark-arrow-down me-2"></i>
+                      Adicionar Anexo
+                    </button>
+                  </div>
+                )}
             </div>
           )}
         </div>

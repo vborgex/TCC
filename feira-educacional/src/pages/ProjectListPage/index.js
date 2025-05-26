@@ -32,25 +32,30 @@ function ProjectListPage() {
     <div className="background min-vh-100 overflow-auto p-0">
       <Navbar />
       <div className="d-flex p-2 justify-content-center">
-        <div className="card-create-project pt-4 p-3  w-100 max-w-900 mt-4 mb-4">
+        <div className="pt-4 p-5 w-100 mt-3 mb-4">
           <div className="text-center">
-            <h2 className="text-uppercase" id="title">
+            <h2 className="text-uppercase" id="title-white">
               Meus projetos
             </h2>
           </div>
           {projetos.length === 0 ? (
-            <div className="d-flex flex-column justify-content-center align-items-center">
+            <div className="card-create-project d-flex flex-column justify-content-center align-items-center m-auto">
               <h5>Você ainda não possui nenhum projeto!</h5>
               <img
                 src={astronaut}
-                className="align-self-center w-50 h-auto"
+                className="align-self-center w-50 h-auto m-1"
                 alt="..."
               />
             </div>
           ) : (
-            <div className="list-group">
+            <div className="row">
               {projetos.map((item) => (
-                <ProjectCard id={item.id} titulo={item.title} status={"ok"} />
+                <ProjectCard
+                  id={item.id}
+                  titulo={item.title}
+                  status={"ok"}
+                  description={item.description}
+                />
               ))}
             </div>
           )}
