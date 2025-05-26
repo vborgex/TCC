@@ -6,6 +6,7 @@ import Navbar from "../../components/navbar";
 import { useSelector } from "react-redux";
 import { dbService } from "../../service/dbService";
 import { useNavigate } from "react-router-dom";
+import CreatePhase from "../../components/createPhase";
 
 function CreateEventPage() {
   const [title, setTitle] = useState("");
@@ -140,6 +141,9 @@ function CreateEventPage() {
                   onChange={(e) => handleRulesFileChange(e.target.files[0])}
                 />
                 {error.file && <p className="text-danger">{error.rulesFile}</p>}
+              </div>
+              <div className="container d-flex p-3 justify-content-center">
+                <CreatePhase />
               </div>
 
               <div className="d-flex gap-2 mt-3 mb-3">
