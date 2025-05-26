@@ -10,13 +10,14 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ProjectListPage from "./pages/ProjectListPage";
 import ProtectedRoute from "./components/protectedRoute";
 import PublicOnlyRoute from "./components/publicOnlyRoute";
-
+import CreateEventPage from "./pages/CreateEventPage";
 function RoutesApp() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/home" element={<HomePage />} />
         <Route path="/details/:id" element={<ProjectDetailsPage />} />
+        <Route path="/createEvent" element={<CreateEventPage/>} />
 
         <Route element={<PublicOnlyRoute />}>
           <Route path="/start" element={<StartPage />} />

@@ -27,8 +27,6 @@ function CreateProjectPage() {
   });
   
   const navigate = useNavigate();
-  const usuarioEmail = useSelector((state) => state.usuario.usuarioEmail);
-  console.log(usuarioEmail)
 
   const handleCategorySelect = (category) => {
     setSelectedCategory(category);
@@ -38,8 +36,7 @@ function CreateProjectPage() {
     setSelectedEducationLevel(educationLevel);
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
+  const handleFileChange = (file) => {
     if (file && file.type === "application/pdf") {
       setSelectedFile(file);
       setError((prev) => ({ ...prev, file: "" }));
@@ -234,7 +231,7 @@ function CreateProjectPage() {
                   id="fileInput"
                   accept="application/pdf"
                   style={{ display: "none" }}
-                  onChange={handleFileChange}
+                  onChange={(e) => setSelectedFile(e.target.files[0]) }
                 />
                 {error.file && <p className="text-danger">{error.file}</p>}
               </div>
