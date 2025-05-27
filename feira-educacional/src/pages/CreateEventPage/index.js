@@ -16,7 +16,7 @@ function CreateEventPage() {
   const [categories, setCategories] = useState([{ value: "" }]);
   const [educationLevels, setEducationLevels] = useState([{ value: "" }]);
   const [phases, setPhases] = useState([
-    { criteria: [{ value: "" }], setSubmission: false, numberApproved:""},
+    { criteria: [{ value: "" }], setSubmission: false, numberApproved: "" },
   ]);
   const [error, setError] = useState({
     title: "",
@@ -29,19 +29,19 @@ function CreateEventPage() {
     general: "",
   });
 
-  console.log(phases)
+  console.log(phases);
 
-  const handlePhaseNumberApprovedBlur =(phaseIndex, e)=>{
-    let value = parseInt(e.target.value)
-    if(isNaN(value)){
-      value=100;
+  const handlePhaseNumberApprovedBlur = (phaseIndex, e) => {
+    let value = parseInt(e.target.value);
+    if (isNaN(value)) {
+      value = 100;
     }
-    if (value<1) value = 1;
-    if (value>5000) value = 5000;
+    if (value < 1) value = 1;
+    if (value > 5000) value = 5000;
     e.target.value = value;
-    const temp = phases.map((phase, index)=>{
-      if(index === phaseIndex){
-        return{
+    const temp = phases.map((phase, index) => {
+      if (index === phaseIndex) {
+        return {
           ...phase,
           numberApproved: value,
         };
@@ -49,7 +49,7 @@ function CreateEventPage() {
       return phase;
     });
     setPhases(temp);
-  }
+  };
 
   const handlePhaseFileSubmissionChange = (phaseIndex) => {
     const temp = phases.map((phase, index) => {
@@ -119,7 +119,10 @@ function CreateEventPage() {
   };
 
   const addPhase = () => {
-    setPhases([...phases, { criteria: [{ value: "" }], setSubmission: false, numberApproved: ""}]);
+    setPhases([
+      ...phases,
+      { criteria: [{ value: "" }], setSubmission: false, numberApproved: "" },
+    ]);
   };
 
   const handleListChange = (list, setList, index, value) => {
@@ -127,7 +130,6 @@ function CreateEventPage() {
     temp[index].value = value;
     setList(temp);
   };
-
 
   const navigate = useNavigate();
 
@@ -157,7 +159,101 @@ function CreateEventPage() {
     }
   };
 
-  const onSubmit = async (e) => {};
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setError({
+      title: "",
+      description: "",
+      RulesFile: "",
+      imageFile: "",
+      categories: "",
+      educationLevels: "",
+      phases: "",
+      general: "",
+    });
+
+    const filteredCategories = categories.filter(
+      (category) => category.value !== ""
+    );
+    const filteredEducationLevels = educationLevels.filter(
+      (level) => level.value !== ""
+    );
+
+    const categoriesEmpty = filteredCategories.length === 0;
+    const educationLevelsEmpty = filteredEducationLevels.length === 0;
+
+    const phasesWithErrors = phases
+      .map((phase, index) => {
+        const hasCriteria = phase.criteria.some(
+          (criterion) => criterion.value !== ""
+        );
+        const isNumberApprovedFilled = phase.numberApproved !== "";
+        if (!hasCriteria && !isNumberApprovedFilled) {
+          return `A fase ${
+            index + 1
+          } deve ter pelo menos um critério de avaliação e o campo de quantidade de alunos preenchido.`;
+        }
+        if (!hasCriteria && isNumberApprovedFilled) {
+          return `A fase ${
+            index + 1
+          } deve ter pelo menos um critério de avaliação preenchido.`;
+        }
+        if (hasCriteria && !isNumberApprovedFilled) {
+          return `A fase ${
+            index + 1
+          } deve ter o campo de quantidade de alunos preenchido.`;
+        }
+        return null;
+      })
+      .filter((error) => error !== null);
+
+    const phasesEmpty = phases.every(
+      (phase) => !phase.criteria.some((criterion) => criterion.value !== "")
+    );
+
+    if (
+      categoriesEmpty ||
+      educationLevelsEmpty ||
+      phasesEmpty ||
+      phasesWithErrors.length > 0
+    ) {
+      if (categoriesEmpty) {
+        setError((prev) => ({
+          ...prev,
+          categories: "O evento deve possuir ao menos uma categoria",
+        }));
+      }
+      if (educationLevelsEmpty) {
+        setError((prev) => ({
+          ...prev,
+          educationLevels:
+            "O evento deve possuir ao menos um nível de escolaridade",
+        }));
+      }
+      if (phasesEmpty) {
+        setError((prev) => ({
+          ...prev,
+          phases:
+            "O evento deve possuir ao menos um critério de avaliação em cada fase.",
+        }));
+      }
+      if (phasesWithErrors.length > 0) {
+        setError((prev) => ({
+          ...prev,
+          phases: phasesWithErrors.join(" "),
+        }));
+      }
+      return;
+    }
+
+    if (!title || !description) {
+      setError((prev) => ({
+        ...prev,
+        general: "Verifique se todos os campos foram preenchidos/selecionados.",
+      }));
+      return;
+    }
+  };
 
   return (
     <div className="background min-vh-100 overflow-auto p-0">
@@ -177,7 +273,9 @@ function CreateEventPage() {
                   onChange={(e) => setTitle(e.target.value)}
                   maxLength="100"
                 />
-                {error.title && <p className="text-danger">{error.title}</p>}
+                {error.title && (
+                  <p className="text-danger fs-6">{error.title}</p>
+                )}
               </div>
 
               <div className="col-12 d-flex flex-column align-items-start mb-3">
@@ -191,7 +289,7 @@ function CreateEventPage() {
                   onChange={(e) => setDescription(e.target.value)}
                 ></textarea>
                 {error.description && (
-                  <p className="text-danger">{error.description}</p>
+                  <p className="text-danger fs-6">{error.description}</p>
                 )}
               </div>
 
@@ -240,7 +338,7 @@ function CreateEventPage() {
                   Adicionar categoria
                 </button>
                 {error.categories && (
-                  <p className="text-danger">{error.categories}</p>
+                  <p className="text-danger fs-6">{error.categories}</p>
                 )}
               </div>
 
@@ -289,7 +387,7 @@ function CreateEventPage() {
                   Adicionar nível
                 </button>
                 {error.educationLevels && (
-                  <p className="text-danger">{error.educationLevels}</p>
+                  <p className="text-danger fs-6">{error.educationLevels}</p>
                 )}
               </div>
 
@@ -315,9 +413,10 @@ function CreateEventPage() {
                   style={{ display: "none" }}
                   onChange={(e) => handleImageFileChange(e.target.files[0])}
                 />
-                {error.file && <p className="text-danger">{error.imageFile}</p>}
+                {error.file && (
+                  <p className="text-danger fs-6">{error.imageFile}</p>
+                )}
               </div>
-
               <div className="col-12 d-flex flex-column align-items-start">
                 <label className="label mb-2">Regulamento do evento</label>
                 <label
@@ -340,7 +439,9 @@ function CreateEventPage() {
                   style={{ display: "none" }}
                   onChange={(e) => handleRulesFileChange(e.target.files[0])}
                 />
-                {error.file && <p className="text-danger">{error.rulesFile}</p>}
+                {error.file && (
+                  <p className="text-danger fs-6">{error.rulesFile}</p>
+                )}
               </div>
 
               <div className="col-12">
@@ -357,7 +458,9 @@ function CreateEventPage() {
                         handlePhaseFileSubmissionChange={
                           handlePhaseFileSubmissionChange
                         }
-                        handlePhaseNumberApprovedBlur={handlePhaseNumberApprovedBlur}
+                        handlePhaseNumberApprovedBlur={
+                          handlePhaseNumberApprovedBlur
+                        }
                       />
                       <button
                         className="btn-remove p-1 w-100 fs-5 mb-2"
@@ -368,7 +471,7 @@ function CreateEventPage() {
                         disabled={phases.length <= 1}
                       >
                         <i className="bi bi-x me-2 flex-shrink-0"></i>
-                        {`REMOVER FASE ${i+1}`}
+                        {`REMOVER FASE ${i + 1}`}
                       </button>
                     </>
                   ))}
@@ -384,6 +487,9 @@ function CreateEventPage() {
                     ADICIONAR FASE
                   </button>
                 </div>
+                {error.phases && (
+                  <p className="text-danger fs-6">{error.phases}</p>
+                )}
 
                 <div className="d-flex gap-2 mt-5 mb-3">
                   <button className="btn btn-cancelar rounded-pill flex-fill">

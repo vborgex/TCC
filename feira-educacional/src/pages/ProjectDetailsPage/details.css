@@ -80,27 +80,7 @@
     color: var(--primary);
     border: 2.5px solid var(--primary);
   }
-  .btn-cancelar {
-    background-color: var(--alert);
-    color: var(--alertText);
-    font-weight: bold;
-    border: none;
-  }
-  
-  .btn-cancelar:hover {
-    background-color: #ffbdbd;
-  }
-  
-  .btn-confirmar {
-    background-color: var(--success);
-    color: var(--successText);
-    font-weight: bold;
-    border: none;
-  }
-  
-  .btn-confirmar:hover {
-    background-color: #a9eacb;
-  }
+
   
 
   /* ======== Inputs ======== */

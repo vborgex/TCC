@@ -23,6 +23,7 @@ function CreateProjectPage() {
     file: "",
     category: "",
     educationLevel: "",
+    phases:"",
     general: "",
   });
   
@@ -57,6 +58,7 @@ function CreateProjectPage() {
       file: "",
       category: "",
       educationLevel: "",
+      phases: "",
       general: "",
     });
 

@@ -91,22 +91,26 @@ body {
     background-color: var(--alert);
     color: var(--alertText);
     font-weight: bold;
-    border: none;
+    border: 2.5px solid var(--alert)
   }
   
   .btn-cancelar:hover {
-    background-color: #ffbdbd;
+    background-color: var(--secondary);
+     border: 2.5px solid var(--alertText);
+     color: var(--alertText);
   }
   
   .btn-confirmar {
     background-color: var(--success);
     color: var(--successText);
     font-weight: bold;
-    border: none;
+    border: 2.5px solid var(--success);
   }
   
   .btn-confirmar:hover {
-    background-color: #a9eacb;
+    background-color: var(--secondary);
+    color: var(--successText);
+    border: 2.5px solid var(--successText);
   }
   
 

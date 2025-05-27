@@ -91,7 +91,6 @@ function CreatePhase({
             placeholder="Digite um número"
             type="number"
             min="0"
-            max="10"
             onBlur={(e)=> handlePhaseNumberApprovedBlur(id, e)}
           />
         </div>
