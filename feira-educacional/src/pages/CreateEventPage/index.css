@@ -43,3 +43,8 @@
     color: var(--alertText);
     border: 2.5px solid var(--alertText);
   }
+  .btn-remove:disabled:hover{
+        background-color: var(--alert);
+    color: var(--secondary);
+    border: 2.5px solid var(--alert);
+  }

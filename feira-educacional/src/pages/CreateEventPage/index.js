@@ -15,7 +15,9 @@ function CreateEventPage() {
   const [imageFile, setImageFile] = useState(null);
   const [categories, setCategories] = useState([{ value: "" }]);
   const [educationLevels, setEducationLevels] = useState([{ value: "" }]);
-  const [phases, setPhases] = useState([]);
+  const [phases, setPhases] = useState([
+    { criteria: [{ value: "" }], setSubmission: false },
+  ]);
   const [error, setError] = useState({
     title: "",
     description: "",
@@ -27,6 +29,61 @@ function CreateEventPage() {
     general: "",
   });
 
+  const handlePhaseFileSubmissionChange = (phaseIndex) => {
+    const temp = phases.map((phase, index) => {
+      if (index === phaseIndex) {
+        return {
+          ...phase,
+          setSubmission: !phase.setSubmission,
+        };
+      }
+      return phase;
+    });
+    setPhases(temp);
+  };
+
+  const addPhaseCriteria = (phaseIndex) => {
+    const temp = phases.map((phase, index) => {
+      if (index === phaseIndex) {
+        return {
+          ...phase,
+          criteria: [...phase.criteria, { value: "" }],
+        };
+      }
+      return phase;
+    });
+    setPhases(temp);
+  };
+
+  const updatePhaseCriteria = (phaseIndex, criteriaIndex, criterion) => {
+    const temp = phases.map((phase, index) => {
+      if (index === phaseIndex) {
+        const newCriteria = phase.criteria.map((c, i) =>
+          i === criteriaIndex ? { value: criterion } : c
+        );
+        return { ...phase, criteria: newCriteria };
+      }
+      return phase;
+    });
+    setPhases(temp);
+  };
+
+  const removePhaseCriteria = (phaseIndex, criteriaIndex) => {
+    const temp = phases.map((phase, index) => {
+      if (index === phaseIndex && phase.criteria.length > 1) {
+        const newCriteria = phase.criteria.filter(
+          (_, i) => i !== criteriaIndex
+        );
+        return {
+          ...phase,
+          criteria: newCriteria,
+        };
+      }
+      return phase;
+    });
+    setPhases(temp);
+  };
+
   const removeInput = (list, setList, index) => {
     if (list.length > 1) {
       const temp = [...list];
@@ -37,6 +94,10 @@ function CreateEventPage() {
 
   const addInput = (list, setList) => {
     setList([...list, { value: "" }]);
+  };
+
+  const addPhase = () => {
+    setPhases([...phases, { criteria: [{ value: "" }], setSubmission: false }]);
   };
 
   const handleListChange = (list, setList, index, value) => {
@@ -160,7 +221,6 @@ function CreateEventPage() {
                 )}
               </div>
 
-             
               <div className="col-12 align-items-start mb-4">
                 <label className="label mb-2">Níveis de escolaridade</label>
                 {educationLevels.map((item, i) => (
@@ -259,21 +319,45 @@ function CreateEventPage() {
                 />
                 {error.file && <p className="text-danger">{error.rulesFile}</p>}
               </div>
-              <div className="container d-flex p-3 justify-content-center">
-                <CreatePhase />
+
+              <div className="col-12">
+                <div className="justify-content-center">
+                  {phases.map((item, i) => (
+                    <CreatePhase
+                      id={i}
+                      criteria={phases[i].criteria}
+                      updatePhaseCriteria={updatePhaseCriteria}
+                      addPhaseCriteria={addPhaseCriteria}
+                      removePhaseCriteria={removePhaseCriteria}
+                      handlePhaseFileSubmissionChange = {handlePhaseFileSubmissionChange}
+                    />
+                  ))}
+                  <button
+                    className="squareBtn p-1 w-100 fs-6"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      addPhase();
+                    }}
+                    disabled={phases.length >= 5}
+                  >
+                    <i className="bi bi-plus me-2 flex-shrink-0"></i>
+                    Adicionar fase
+                  </button>
+                </div>
+
+                <div className="d-flex gap-2 mt-3 mb-3">
+                  <button className="btn btn-cancelar rounded-pill flex-fill">
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-confirmar rounded-pill flex-fill"
+                  >
+                    Confirmar
+                  </button>
+                </div>
               </div>
 
-              <div className="d-flex gap-2 mt-3 mb-3">
-                <button className="btn btn-cancelar rounded-pill flex-fill">
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-confirmar rounded-pill flex-fill"
-                >
-                  Confirmar
-                </button>
-              </div>
               {error.general && (
                 <p className="text-danger fs-6">{error.general}</p>
               )}
