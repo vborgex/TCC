@@ -94,6 +94,25 @@ export const dbService = {
       throw error;
     }
   },
+  async getAdmEvents(){
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error("Usuário não autenticado.");
+
+      const eventRef = collection(db, "events");
+      const q = query(eventRef, where("creatorId", "==", user.uid));
+      const querySnapshot = await getDocs(q);
+
+      const events = [];
+      querySnapshot.forEach((doc)=>{
+        events.push({id: doc.id, ...doc.data() })
+      });
+
+      return events;
+    } catch (error) {
+      throw error;
+    }
+  },
   async getUserData() {
     try {
       const user = auth.currentUser;

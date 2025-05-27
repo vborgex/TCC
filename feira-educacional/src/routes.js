@@ -11,6 +11,7 @@ import ProjectListPage from "./pages/ProjectListPage";
 import ProtectedRoute from "./components/protectedRoute";
 import PublicOnlyRoute from "./components/publicOnlyRoute";
 import CreateEventPage from "./pages/CreateEventPage";
+import EventListPage from "./pages/EventListPage";
 function RoutesApp() {
   return (
     <BrowserRouter>
@@ -18,6 +19,7 @@ function RoutesApp() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/details/:id" element={<ProjectDetailsPage />} />
         <Route path="/createEvent" element={<CreateEventPage/>} />
+        <Route path="/myEvents" element={<EventListPage/>}/>
 
         <Route element={<PublicOnlyRoute />}>
           <Route path="/start" element={<StartPage />} />
@@ -28,7 +30,7 @@ function RoutesApp() {
 
         <Route element={<ProtectedRoute allowedRoutes={["ORIENTADOR"]} />}>
           <Route path="/createProject" element={<CreateProjectPage />} />
-          <Route path="/projectList" element={<ProjectListPage />} />
+          <Route path="/myProjects" element={<ProjectListPage />} />
         </Route>
         <Route element={<ProtectedRoute allowedRoutes={["AVALIADOR"]} />}>
           <Route path="/evaluate/:id" element={<EvaluationPage />} />
