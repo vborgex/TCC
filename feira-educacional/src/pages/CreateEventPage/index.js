@@ -323,17 +323,32 @@ function CreateEventPage() {
               <div className="col-12">
                 <div className="justify-content-center">
                   {phases.map((item, i) => (
-                    <CreatePhase
-                      id={i}
-                      criteria={phases[i].criteria}
-                      updatePhaseCriteria={updatePhaseCriteria}
-                      addPhaseCriteria={addPhaseCriteria}
-                      removePhaseCriteria={removePhaseCriteria}
-                      handlePhaseFileSubmissionChange = {handlePhaseFileSubmissionChange}
-                    />
+                    <>
+                      <CreatePhase
+                        id={i}
+                        criteria={phases[i].criteria}
+                        updatePhaseCriteria={updatePhaseCriteria}
+                        addPhaseCriteria={addPhaseCriteria}
+                        removePhaseCriteria={removePhaseCriteria}
+                        handlePhaseFileSubmissionChange={
+                          handlePhaseFileSubmissionChange
+                        }
+                      />
+                      <button
+                        className="btn-remove p-1 w-100 fs-5 mb-2"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          removeInput(phases, setPhases, i);
+                        }}
+                        disabled={phases.length <= 1}
+                      >
+                        <i className="bi bi-x me-2 flex-shrink-0"></i>
+                        {`REMOVER FASE ${i+1}`}
+                      </button>
+                    </>
                   ))}
                   <button
-                    className="squareBtn p-1 w-100 fs-6"
+                    className="squareBtn p-1 w-100 fs-5"
                     onClick={(e) => {
                       e.preventDefault();
                       addPhase();
@@ -341,11 +356,11 @@ function CreateEventPage() {
                     disabled={phases.length >= 5}
                   >
                     <i className="bi bi-plus me-2 flex-shrink-0"></i>
-                    Adicionar fase
+                    ADICIONAR FASE
                   </button>
                 </div>
 
-                <div className="d-flex gap-2 mt-3 mb-3">
+                <div className="d-flex gap-2 mt-5 mb-3">
                   <button className="btn btn-cancelar rounded-pill flex-fill">
                     Cancelar
                   </button>

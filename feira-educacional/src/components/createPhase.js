@@ -56,7 +56,7 @@ function CreatePhase({id, criteria, updatePhaseCriteria, addPhaseCriteria, remov
           </div>
         ))}
         <button
-          className="squareBtn p-1 w-100 fs-6"
+          className="squareBtn p-1 w-100 fs-6 mb-3"
           onClick={(e) => {
             e.preventDefault();
             addPhaseCriteria(id);
