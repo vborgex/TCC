@@ -1,5 +1,13 @@
 import { db, auth } from "./../config/firebase";
-import {  collection, addDoc, doc, getDoc, getDocs, query, where,} from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 
 export const dbService = {
   async createProject(title, description, educationLevel, category) {
@@ -47,6 +55,41 @@ export const dbService = {
       });
 
       return projects;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async createEvent(title, description, categories, educationLevels, phases) {
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error("Usuário não autenticado.");
+
+      const categoriesToSave = categories
+        .map((cat) => cat.value.trim())
+        .filter((val) => val !== "");
+      const educationLevelsToSave = educationLevels
+        .map((level) => level.value.trim())
+        .filter((val) => val !== "");
+
+      const phasesToSave = phases.map((phase) => ({
+        criteria: phase.criteria
+          .map((c) => c.value.trim())
+          .filter((val) => val !== ""),
+        setSubmission: phase.setSubmission,
+        numberApproved: phase.numberApproved,
+      }));
+      const newEvent = {
+        title,
+        description,
+        categories: categoriesToSave,
+        educationLevels: educationLevelsToSave,
+        phases: phasesToSave,
+        creatorId: user.uid,
+        createdAt: new Date(),
+      };
+
+      await addDoc(collection(db, "events"), newEvent);
     } catch (error) {
       throw error;
     }

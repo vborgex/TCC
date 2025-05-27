@@ -253,6 +253,14 @@ function CreateEventPage() {
       }));
       return;
     }
+
+    try {
+      await dbService.createEvent(title, description, filteredCategories, filteredEducationLevels, phases);
+      navigate("/home");
+    } catch (err) {
+      console.log(err);
+      setError((prev)=>({...prev, general: "Erro ao cadastrar o evento"}))
+    }
   };
 
   return (
