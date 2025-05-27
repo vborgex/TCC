@@ -16,7 +16,7 @@ function CreateEventPage() {
   const [categories, setCategories] = useState([{ value: "" }]);
   const [educationLevels, setEducationLevels] = useState([{ value: "" }]);
   const [phases, setPhases] = useState([
-    { criteria: [{ value: "" }], setSubmission: false },
+    { criteria: [{ value: "" }], setSubmission: false, numberApproved:""},
   ]);
   const [error, setError] = useState({
     title: "",
@@ -28,6 +28,28 @@ function CreateEventPage() {
     phases: "",
     general: "",
   });
+
+  console.log(phases)
+
+  const handlePhaseNumberApprovedBlur =(phaseIndex, e)=>{
+    let value = parseInt(e.target.value)
+    if(isNaN(value)){
+      value=100;
+    }
+    if (value<1) value = 1;
+    if (value>5000) value = 5000;
+    e.target.value = value;
+    const temp = phases.map((phase, index)=>{
+      if(index === phaseIndex){
+        return{
+          ...phase,
+          numberApproved: value,
+        };
+      }
+      return phase;
+    });
+    setPhases(temp);
+  }
 
   const handlePhaseFileSubmissionChange = (phaseIndex) => {
     const temp = phases.map((phase, index) => {
@@ -97,7 +119,7 @@ function CreateEventPage() {
   };
 
   const addPhase = () => {
-    setPhases([...phases, { criteria: [{ value: "" }], setSubmission: false }]);
+    setPhases([...phases, { criteria: [{ value: "" }], setSubmission: false, numberApproved: ""}]);
   };
 
   const handleListChange = (list, setList, index, value) => {
@@ -105,6 +127,7 @@ function CreateEventPage() {
     temp[index].value = value;
     setList(temp);
   };
+
 
   const navigate = useNavigate();
 
@@ -327,12 +350,14 @@ function CreateEventPage() {
                       <CreatePhase
                         id={i}
                         criteria={phases[i].criteria}
+                        numberApproved={phases[i].numberApproved}
                         updatePhaseCriteria={updatePhaseCriteria}
                         addPhaseCriteria={addPhaseCriteria}
                         removePhaseCriteria={removePhaseCriteria}
                         handlePhaseFileSubmissionChange={
                           handlePhaseFileSubmissionChange
                         }
+                        handlePhaseNumberApprovedBlur={handlePhaseNumberApprovedBlur}
                       />
                       <button
                         className="btn-remove p-1 w-100 fs-5 mb-2"

@@ -1,11 +1,20 @@
 import { useState } from "react";
 import "./createPhase.css";
 
-function CreatePhase({id, criteria, updatePhaseCriteria, addPhaseCriteria, removePhaseCriteria, handlePhaseFileSubmissionChange}) {
+function CreatePhase({
+  id,
+  criteria,
+  numberApproved,
+  updatePhaseCriteria,
+  addPhaseCriteria,
+  removePhaseCriteria,
+  handlePhaseFileSubmissionChange,
+  handlePhaseNumberApprovedBlur
+}) {
   return (
     <div className="row">
       <div className="col-12 mb-2">
-        <label className="label fs-5">{`Fase ${id+1}`}</label>
+        <label className="label fs-5">{`Fase ${id + 1}`}</label>
       </div>
 
       <div className="col-12 col-md-6 mb-2">
@@ -25,7 +34,12 @@ function CreatePhase({id, criteria, updatePhaseCriteria, addPhaseCriteria, remov
 
       <div className="col-12 mb-2">
         <div className="form-check">
-          <input className="form-check-input" type="checkbox" id="fileSubmit" onChange={() => handlePhaseFileSubmissionChange(id)}/>
+          <input
+            className="form-check-input"
+            type="checkbox"
+            id="fileSubmit"
+            onChange={() => handlePhaseFileSubmissionChange(id)}
+          />
           <label className="form-check-label" htmlFor="fileSubmit">
             Submissão de arquivo
           </label>
@@ -66,6 +80,21 @@ function CreatePhase({id, criteria, updatePhaseCriteria, addPhaseCriteria, remov
           <i className="bi bi-plus me-2 flex-shrink-0"></i>
           Adicionar critério
         </button>
+      </div>
+
+      <div className="col-6 mb-2">
+        <label className="label mb-2">Quantia de aprovados</label>
+        <div className="input w-50">
+          <input
+            className="form-control mb-2 no-spinner"
+            id="projectGrade"
+            placeholder="Digite um número"
+            type="number"
+            min="0"
+            max="10"
+            onBlur={(e)=> handlePhaseNumberApprovedBlur(id, e)}
+          />
+        </div>
       </div>
     </div>
   );
