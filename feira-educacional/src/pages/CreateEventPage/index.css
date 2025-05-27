@@ -1,0 +1,45 @@
+  .sublabel{
+    color: var(--accent2);
+    font-weight:650;
+    margin: 3px;
+    font-size: clamp(1rem, 2vw, 1.1rem);;
+  }
+
+  .squareBtn{
+    background-color: var(--accent2);
+    font-weight: bold;
+    color: var(--secondary);
+    border: 2.5px solid transparent;
+    border-radius: 10px;
+  }
+  .squareBtn:hover{
+    background-color: var(--secondary);
+    color: var(--accent2);
+    border: 2.5px solid var(--accent);
+  }
+  .squareBtn:disabled{
+    background-color: #c6f5ff;
+    color: var(--secondary);
+  }
+  .squareBtn:disabled:hover{
+    background-color: #c6f5ff;
+    color: var(--secondary);
+    border: 2.5px solid #c6f5ff;
+  }
+  .btn-remove{
+    background-color: var(--alertText);
+    color: var(--secondary);
+    font-weight: bold;
+    border: 2.5px solid var(--alertText);
+    border-radius: 10px;
+  }
+  .btn-remove:disabled{
+    background-color: var(--alert);
+    color: var(--secondary);
+    border: 2.5px solid var(--alert);
+  }
+  .btn-remove:hover{
+    background-color: var(--secondary);
+    color: var(--alertText);
+    border: 2.5px solid var(--alertText);
+  }

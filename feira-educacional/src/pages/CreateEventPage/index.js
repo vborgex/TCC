@@ -13,8 +13,8 @@ function CreateEventPage() {
   const [description, setDescription] = useState("");
   const [RulesFile, setRulesFile] = useState(null);
   const [imageFile, setImageFile] = useState(null);
-  const [categories, setCategories] = useState([]);
-  const [educationLevels, setEducationLevels] = useState([]);
+  const [categories, setCategories] = useState([{ value: "" }]);
+  const [educationLevels, setEducationLevels] = useState([{ value: "" }]);
   const [phases, setPhases] = useState([]);
   const [error, setError] = useState({
     title: "",
@@ -26,6 +26,24 @@ function CreateEventPage() {
     phases: "",
     general: "",
   });
+
+  const removeInput = (list, setList, index) => {
+    if (list.length > 1) {
+      const temp = [...list];
+      temp.splice(index, 1);
+      setList(temp);
+    }
+  };
+
+  const addInput = (list, setList) => {
+    setList([...list, { value: "" }]);
+  };
+
+  const handleListChange = (list, setList, index, value) => {
+    const temp = [...list];
+    temp[index].value = value;
+    setList(temp);
+  };
 
   const navigate = useNavigate();
 
@@ -43,7 +61,7 @@ function CreateEventPage() {
   };
 
   const handleImageFileChange = (file) => {
-    if ((file && file.type === "image/jpeg") || file.type === "image/png") {
+    if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
       setImageFile(file);
       setError((prev) => ({ ...prev, imageFile: "" }));
     } else {
@@ -67,7 +85,7 @@ function CreateEventPage() {
           </div>
           <form onSubmit={onSubmit}>
             <div className="row justify-content-start align-items-end">
-              <div className="col-12 d-flex flex-column align-items-start">
+              <div className="col-12 d-flex flex-column align-items-start mb-3">
                 <label className="label mb-2">Nome do evento</label>
                 <input
                   className="form-control mb-2"
@@ -78,7 +96,7 @@ function CreateEventPage() {
                 {error.title && <p className="text-danger">{error.title}</p>}
               </div>
 
-              <div className="col-12 d-flex flex-column align-items-start">
+              <div className="col-12 d-flex flex-column align-items-start mb-3">
                 <label className="label mb-2">Descrição do evento</label>
                 <textarea
                   className="form-control mb-2"
@@ -90,6 +108,105 @@ function CreateEventPage() {
                 ></textarea>
                 {error.description && (
                   <p className="text-danger">{error.description}</p>
+                )}
+              </div>
+
+              <div className="col-12 align-items-start mb-4">
+                <label className="label mb-2">Categorias</label>
+                {categories.map((item, i) => (
+                  <div key={i} className="d-flex mb-2">
+                    <div className="w-100 d-flex flex-column flex-sm-row gap-2">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder={`Categoria ${i + 1}`}
+                        value={categories[i].value}
+                        onChange={(e) =>
+                          handleListChange(
+                            categories,
+                            setCategories,
+                            i,
+                            e.target.value
+                          )
+                        }
+                        maxLength="80"
+                      />
+                      <button
+                        className="btn-remove"
+                        onClick={() =>
+                          removeInput(categories, setCategories, i)
+                        }
+                        disabled={categories.length <= 1}
+                        type="button"
+                      >
+                        Remover
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                <button
+                  className="squareBtn p-1 w-100 fs-6"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    addInput(categories, setCategories);
+                  }}
+                  disabled={categories.length >= 10}
+                >
+                  <i className="bi bi-plus me-2 flex-shrink-0"></i>
+                  Adicionar categoria
+                </button>
+                {error.categories && (
+                  <p className="text-danger">{error.categories}</p>
+                )}
+              </div>
+
+             
+              <div className="col-12 align-items-start mb-4">
+                <label className="label mb-2">Níveis de escolaridade</label>
+                {educationLevels.map((item, i) => (
+                  <div key={i} className="d-flex mb-2">
+                    <div className="w-100 d-flex flex-column flex-sm-row gap-2">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder={`Nível ${i + 1}`}
+                        value={educationLevels[i].value}
+                        onChange={(e) =>
+                          handleListChange(
+                            educationLevels,
+                            setEducationLevels,
+                            i,
+                            e.target.value
+                          )
+                        }
+                        maxLength="80"
+                      />
+                      <button
+                        className="btn-remove"
+                        onClick={() =>
+                          removeInput(educationLevels, setEducationLevels, i)
+                        }
+                        disabled={educationLevels.length <= 1}
+                        type="button"
+                      >
+                        Remover
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                <button
+                  className="squareBtn p-1 w-100 fs-6"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    addInput(educationLevels, setEducationLevels);
+                  }}
+                  disabled={educationLevels.length >= 5}
+                >
+                  <i className="bi bi-plus me-2 flex-shrink-0"></i>
+                  Adicionar nível
+                </button>
+                {error.educationLevels && (
+                  <p className="text-danger">{error.educationLevels}</p>
                 )}
               </div>
 

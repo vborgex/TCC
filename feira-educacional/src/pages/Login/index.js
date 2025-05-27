@@ -61,15 +61,17 @@ function LoginPage() {
       dispatch({ type: "LOG_IN", usuarioEmail: email });
       navigate("/home");
     } catch (err) {
+      console.log(err.code);
+      console.log(err);
       setIsSubmitting(false);
       switch (err.code) {
         case "auth/user-not-found":
           setError((prev) => ({ ...prev, email: "E-mail não cadastrado." }));
           break;
-        case "auth/wrong-password":
+        case "auth/invalid-credential":
           setError((prev) => ({
             ...prev,
-            password: "A senha fornecida está incorreta.",
+            password: "E-mail ou senha incorretos.",
           }));
           break;
         case "auth/invalid-email":
@@ -87,6 +89,7 @@ function LoginPage() {
           break;
         default:
           setError((prev) => ({ ...prev, general: "Erro ao logar." }));
+          break;
       }
     }
   };
