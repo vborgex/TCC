@@ -11,6 +11,7 @@ import ProjectCard from "../../components/projectCard";
 
 function ProjectListPage() {
   const [projetos, setProjetos] = useState([]);
+  const [search, setSearch] = useState("");
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -27,16 +28,27 @@ function ProjectListPage() {
 
     return () => unsubscribe();
   }, []);
-
+  const filteredProjects = projetos.filter((project) =>
+    project.title.toLowerCase().includes(search.toLowerCase())
+  );
   return (
     <div className="background min-vh-100 overflow-auto p-0">
       <Navbar />
       <div className="d-flex p-2 justify-content-center">
-        <div className="pt-4 p-5 w-100 mt-3 mb-4">
+        <div className="pt-4 p-5 w-100 mb-4">
           <div className="text-center">
-            <h2 className="text-uppercase" id="title-white">
-              Meus projetos
-            </h2>
+            <div className="input-group mb-4 rounded mx-auto search">
+              <span className="input-group-text rounded-start">
+                <i className="bi bi-search"></i>
+              </span>
+              <input
+                type="text"
+                className="form-control  rounded-end search-input"
+                placeholder="Pesquisar projetos..."
+                maxLength="50"
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
           </div>
           {projetos.length === 0 ? (
             <div className="card-create-project d-flex flex-column justify-content-center align-items-center m-auto">
@@ -48,8 +60,17 @@ function ProjectListPage() {
               />
             </div>
           ) : (
+            <></>
+          )}
+          {filteredProjects.length === 0 ? (
+            <div className="text-white text-center m-auto ">
+              <h5 className="text-uppercase fs-4 ">
+                <strong>Nenhum projeto corresponde à pesquisa!</strong>
+              </h5>
+            </div>
+          ) : (
             <div className="row">
-              {projetos.map((item) => (
+              {filteredProjects.map((item) => (
                 <ProjectCard
                   id={item.id}
                   titulo={item.title}

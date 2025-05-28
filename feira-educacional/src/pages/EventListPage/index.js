@@ -11,6 +11,7 @@ import EventCard from "../../components/eventCard";
 
 function EventListPage() {
   const [events, setEvents] = useState([]);
+  const [search, setSearch] = useState("");
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -24,20 +25,33 @@ function EventListPage() {
         console.warn("Usuária não está logada!");
       }
     });
-
     return () => unsubscribe();
   }, []);
+
+  const filteredEvents = events.filter((event) =>
+    event.title.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="background min-vh-100 overflow-auto p-0">
       <Navbar />
       <div className="d-flex p-2 justify-content-center">
-        <div className="pt-4 p-5 w-100 mt-3 mb-4">
+        <div className="pt-4 p-5 w-100 mb-4">
           <div className="text-center">
-            <h2 className="text-uppercase" id="title-white">
-              Meus eventos
-            </h2>
+            <div className="input-group mb-4 rounded mx-auto search">
+              <span className="input-group-text rounded-start">
+                <i className="bi bi-search"></i>
+              </span>
+              <input
+                type="text"
+                className="form-control  rounded-end search-input"
+                placeholder="Pesquisar eventos..."
+                maxLength="50"
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
           </div>
+
           {events.length === 0 ? (
             <div className="card-create-project d-flex flex-column justify-content-center align-items-center m-auto">
               <h5>Você ainda não possui nenhum evento!</h5>
@@ -48,8 +62,17 @@ function EventListPage() {
               />
             </div>
           ) : (
+            <></>
+          )}
+          {filteredEvents.length === 0 ? (
+            <div className="text-white text-center m-auto ">
+              <h5 className="text-uppercase fs-4 ">
+                <strong>Nenhum evento corresponde à pesquisa!</strong>
+              </h5>
+            </div>
+          ) : (
             <div className="row">
-              {events.map((item) => (
+              {filteredEvents.map((item) => (
                 <EventCard
                   id={item.id}
                   titulo={item.title}

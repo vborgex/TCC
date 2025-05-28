@@ -54,7 +54,7 @@ function Navbar() {
                     aria-labelledby="navbarDropdownMenuLink"
                   >
                     <li>
-                      <Link to="/projectList" className="dropdown-item">
+                      <Link to="/myprojects" className="dropdown-item">
                         <i className="bi bi-folder me-1"></i>
                         Meus projetos
                       </Link>

@@ -7,7 +7,7 @@ function EventCard({ id, titulo, status, description }) {
   return (
     
     <div className="div col-md-3 col-sm-12  p-1">
-      <Link to={"/details/" + id} className="card text-decoration-none">
+      <Link to={"/event/" + id} className="card text-decoration-none">
         <img src="https://placehold.co/600x400" className="card-img-top card-img object-fit-cover" alt="..."/>
         <div className="card-body">
           <h5 id="projectTitle" className="project-title text-truncate">

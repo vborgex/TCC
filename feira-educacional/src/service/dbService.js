@@ -10,8 +10,16 @@ import {
 } from "firebase/firestore";
 
 export const dbService = {
-  async createProject(title, description, educationLevel, category) {
+  async createProject(title, description, educationLevel, category, eventId) {
     try {
+      
+      const eventRef = doc(db, "events", eventId);
+      const eventSnap = await getDoc(eventRef);
+
+      if (!eventSnap.exists()) {
+        throw new Error("O evento especificado não existe.");
+      }
+
       const user = auth.currentUser;
       if (!user) throw new Error("Usuário não autenticado.");
 
@@ -21,6 +29,7 @@ export const dbService = {
         educationLevel,
         category,
         creatorId: user.uid,
+        eventId,
         createdAt: new Date(),
       };
 
@@ -90,6 +99,15 @@ export const dbService = {
       };
 
       await addDoc(collection(db, "events"), newEvent);
+    } catch (error) {
+      throw error;
+    }
+  },
+  async getEventData(eventId){
+    try {
+      const eventDoc = await getDoc(doc(db, "events", eventId));
+      if(!eventDoc.exists()) return null;
+      return eventDoc.data();
     } catch (error) {
       throw error;
     }
