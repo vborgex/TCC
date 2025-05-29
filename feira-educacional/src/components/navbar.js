@@ -40,7 +40,8 @@ function Navbar() {
               </li>
               {role === "ORIENTADOR" ? (
                 <li className="nav-item dropdown">
-                  <Link to="/"
+                  <Link
+                    to="/"
                     className="nav-link dropdown-toggle"
                     id="navbarDropdownMenuLink"
                     role="button"
@@ -54,39 +55,47 @@ function Navbar() {
                     aria-labelledby="navbarDropdownMenuLink"
                   >
                     <li>
-                      <Link to="/myprojects" className="dropdown-item">
+                      <Link
+                        to="/myprojects"
+                        className="dropdown-item align-items-center"
+                      >
                         <i className="bi bi-folder me-1"></i>
                         Meus projetos
                       </Link>
                     </li>
                     <li>
-                      <Link to="/createProject" className="dropdown-item" >
-                        <i className="bi bi-file-earmark-plus me-1"></i>
-                        Criar projeto
+                      <Link
+                        to="/createProject"
+                        className="dropdown-item align-items-center"
+                      >
+                        <i className="bi bi-heart me-1"></i>
+                        Favoritos
                       </Link>
                     </li>
                   </ul>
                 </li>
-              ) : (
-                <></>
-              )}
-              {role==="AVALIADOR" ? (
+              ) : role === "AVALIADOR" ? (
                 <li className="nav-item">
-                <Link to="" className="nav-link">
-                  Eventos
-                </Link>
-              </li>
-              ):(
-              <></>
+                  <Link to="" className="nav-link">
+                    Eventos
+                  </Link>
+                </li>
+              ) : role === "ORGANIZADOR" ? (
+                  <li className="nav-item">
+                    <Link to="" className="nav-link">
+                      Eventos
+                    </Link>
+                  </li>
+                ) :(<> </>)}
 
-              )}
               <li className="nav-item">
                 <Link to="" className="nav-link">
                   Notificações
                 </Link>
               </li>
               <li className="nav-item dropdown">
-                <Link to=""
+                <Link
+                  to=""
                   className="nav-link dropdown-toggle"
                   id="navbarDropdownMenuLink"
                   role="button"

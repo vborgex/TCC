@@ -16,7 +16,7 @@ function ProjectListPage() {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
-          const resultado = await dbService.getProjects();
+          const resultado = await dbService.getUserProjects();
           setProjetos(resultado);
         } catch (error) {
           console.error("Erro ao buscar projetos:", error);
@@ -59,10 +59,7 @@ function ProjectListPage() {
                 alt="..."
               />
             </div>
-          ) : (
-            <></>
-          )}
-          {filteredProjects.length === 0 ? (
+          ) : filteredProjects.length === 0 ? (
             <div className="text-white text-center m-auto ">
               <h5 className="text-uppercase fs-4 ">
                 <strong>Nenhum projeto corresponde à pesquisa!</strong>

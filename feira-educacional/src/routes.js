@@ -13,6 +13,7 @@ import PublicOnlyRoute from "./components/publicOnlyRoute";
 import CreateEventPage from "./pages/CreateEventPage";
 import EventListPage from "./pages/EventListPage";
 import EventDetailsPage from "./pages/EventDetailsPage";
+import PublicEventListPage from "./pages/PublicEventList";
 function RoutesApp() {
   return (
     <BrowserRouter>
@@ -22,6 +23,7 @@ function RoutesApp() {
         <Route path="/event/:id" element={<EventDetailsPage/>}/>
         <Route path="/createEvent" element={<CreateEventPage/>} />
         <Route path="/myEvents" element={<EventListPage/>}/>
+        <Route path="/events" element={<PublicEventListPage/>}/>
 
         <Route element={<PublicOnlyRoute />}>
           <Route path="/start" element={<StartPage />} />

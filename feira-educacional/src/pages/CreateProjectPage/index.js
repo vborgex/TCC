@@ -48,7 +48,6 @@
 
       fetchEvent();
     }, [id]);
-    console.log("Evento",event)
     const navigate = useNavigate();
 
     const handleCategorySelect = (category) => {
@@ -162,7 +161,7 @@
                         id="projectSummary"
                         placeholder="Escreva um resumo do projeto..."
                         rows="4"
-                        maxLength="280"
+                        maxLength="600"
                         onChange={(e) => setDescription(e.target.value)}
                       ></textarea>
                       {error.description && (

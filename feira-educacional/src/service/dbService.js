@@ -48,8 +48,20 @@ export const dbService = {
       throw error;
     }
   },
-
-  async getProjects() {
+  async getProjects(){
+    try {
+      const projectRef = collection(db, "projects");
+      const querySnapshot = await getDocs(projectRef);
+      const projects = []
+      querySnapshot.forEach((doc)=>{
+        projects.push({id: doc.id, ...doc.data()});
+      });
+      return projects;
+    } catch (error) {
+      throw error;
+    }
+  },
+  async getUserProjects() {
     try {
       const user = auth.currentUser;
       if (!user) throw new Error("Usuário não autenticado.");
@@ -130,6 +142,38 @@ export const dbService = {
     } catch (error) {
       throw error;
     }
+  },
+    async getEvents(){
+    try {
+      const eventRef = collection(db, "events");
+      const querySnapshot = await getDocs(eventRef);
+      const events = []
+      querySnapshot.forEach((doc)=>{
+        events.push({id: doc.id, ...doc.data()});
+      });
+      return events;
+    } catch (error) {
+      throw error;
+    }
+  }, 
+  async createEvaluation(projectId, eventId, evaluation){
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error("Usuário não autenticado.");
+
+      const newEvaluation = {
+        projectId: projectId,
+        eventid: eventId,
+        evaluation: evaluation,
+        evaluatorId: user.uid,
+        createdAt: new Date(),
+      }
+      const evaluationRef = collection(db, "evaluations");
+      await addDoc(evaluationRef, newEvaluation);
+    } catch (error) {
+      throw error;
+    }
+
   },
   async getUserData() {
     try {

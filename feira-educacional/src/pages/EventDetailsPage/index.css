@@ -1,0 +1,26 @@
+.btn-favorite{
+    background-color: var(--accent2);
+    color: var(--secondary);
+    border: 2.5px solid var(--accent2);
+    border-radius: 50%;
+    -webkit-text-stroke: 1px;
+}
+
+.btn-favorite:hover{
+    background-color: var(--secondary);
+    border: 2.5px solid var(--accent2);
+    color: var(--accent2);
+    -webkit-text-stroke: 1.5px;
+}
+
+.btn-create{
+    background-color: var(--accent);
+    color: var(--secondary);
+    border: 2.5px solid var(--accent);
+}
+
+.btn-create:hover{
+    background-color: var(--secondary);
+    border: 2.5px solid var(--accent);
+    color: var(--accent);
+}

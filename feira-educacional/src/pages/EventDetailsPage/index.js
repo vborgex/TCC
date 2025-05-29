@@ -5,8 +5,8 @@ import "./../EventDetailsPage/index.css";
 import Navbar from "../../components/navbar";
 import { useSelector } from "react-redux";
 import { dbService } from "../../service/dbService";
-import { Link, useParams } from "react-router-dom";
 import astronaut from "./../../assets/Astronaut3.svg";
+import { Link, useParams } from "react-router-dom";
 
 function EventDetailsPage() {
   const { id } = useParams();
@@ -14,6 +14,8 @@ function EventDetailsPage() {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const isLoggedIn = useSelector((state) => state.usuario.usuarioLogado);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     async function fetchEvent() {
@@ -25,12 +27,20 @@ function EventDetailsPage() {
           setError(true);
         }
       } catch (error) {
+        console.error("Error fetching event data:", error);
         setError(true);
       } finally {
         setLoading(false);
       }
     }
 
+    async function getUser() {
+      if (isLoggedIn) {
+        const userData = await dbService.getUserData();
+        setUser(userData);
+      }
+    }
+    getUser();
     fetchEvent();
   }, [id]);
 
@@ -52,30 +62,48 @@ function EventDetailsPage() {
                 alt="..."
               />
             </div>
-          ) : (<>
-        <div className="text-center text-uppercase">
-            <h2 id="eventName" className="fs-3 text-truncate">{event.title}</h2>
-          </div>
-            <div className="row justify-content-start align-items-start">
-              <div className="col-lg-6 col-12 d-flex flex-column align-items-start">
-                <label className="label mb-2">Categorias</label>
-                {event.categories.map((item, i) =>(
-                    <p key={i}>{item}</p>
-                ))}
-
-              </div>
-              <div className="col-lg-6 col-12 d-flex flex-column align-items-start">
-                <label className="label mb-2">Níveis de escolaridade</label>
-                {event.educationLevels.map((item, i)=>(
-                    <p key={i}>{item}</p>
-                ))}
-
+          ) : (
+            <>
+              <div className="text-center text-uppercase">
+                <h2 id="eventName" className="fs-3 text-truncate">
+                  {event.title}
+                </h2>
               </div>
               <div className="col-12 d-flex flex-column align-items-start">
                 <label className="label mb-2">Resumo do evento</label>
                 <p className="text-justify">{event.description}</p>
               </div>
-            </div></>
+
+              <div className="row justify-content-start align-items-start">
+                <div className="col-lg-6 col-12 d-flex flex-column align-items-start">
+                  <label className="label mb-2">Categorias</label>
+                  {event.categories.map((item, i) => (
+                    <p key={i}>{item}</p>
+                  ))}
+                </div>
+                <div className="col-lg-6 col-12 d-flex flex-column align-items-start">
+                  <label className="label mb-2">Níveis de escolaridade</label>
+                  {event.educationLevels.map((item, i) => (
+                    <p key={i}>{item}</p>
+                  ))}
+                </div>
+
+                {isLoggedIn && role === "ORIENTADOR" ? (
+                  <>
+                    <div class="col-auto me-auto">
+                      <Link className=" btn btn-create btn-sm" to={`/createproject/${id}`}>
+                        Criar projeto
+                      </Link>
+                    </div>
+                    <div class="col-auto">
+                      <button className="btn btn-favorite">
+                        <i className="bi bi-heart"></i>
+                      </button>
+                    </div>
+                  </>
+                ) : null}
+              </div>
+            </>
           )}
         </div>
       </div>

@@ -4,34 +4,27 @@ import "./index.css";
 import Navbar from "../../components/navbar";
 import { useState, useEffect } from "react";
 import { dbService } from "./../../service/dbService";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./../../config/firebase";
 import astronaut from "./../../assets/Astronaut3.svg";
 import EventCard from "../../components/eventCard";
 
-function EventListPage() {
+function PublicEventListPage() {
   const [events, setEvents] = useState([]);
   const [search, setSearch] = useState("");
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          const resultado = await dbService.getAdmEvents();
-          setEvents(resultado);
-        } catch (error) {
-          console.error("Erro ao buscar eventos:", error);
-        }
-      } else {
-        console.warn("Usuária não está logada!");
+    async function fetchEvents() {
+      try {
+        const resultado = await dbService.getEvents();
+        setEvents(resultado);
+      } catch (error) {
+        console.error("Erro ao buscar eventos:", error);
       }
-    });
-    return () => unsubscribe();
+    }
+
+    fetchEvents();
   }, []);
-
-  const filteredEvents = events.filter((event) =>
-    event.title.toLowerCase().includes(search.toLowerCase())
-  );
-
+  
+  
+  const filteredEvents = events.filter((event) => event.title.toLowerCase().includes(search.toLowerCase()));
   return (
     <div className="background min-vh-100 overflow-auto p-0">
       <Navbar />
@@ -54,7 +47,7 @@ function EventListPage() {
 
           {events.length === 0 ? (
             <div className="card-create-project d-flex flex-column justify-content-center align-items-center m-auto">
-              <h5>Você ainda não possui nenhum evento!</h5>
+              <h5>Nenhum evento por aqui!</h5>
               <img
                 src={astronaut}
                 className="align-self-center w-50 h-auto m-1"
@@ -85,4 +78,4 @@ function EventListPage() {
   );
 }
 
-export default EventListPage;
+export default PublicEventListPage;
