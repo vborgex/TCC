@@ -12,7 +12,6 @@ import {
 export const dbService = {
   async createProject(title, description, educationLevel, category, eventId) {
     try {
-      
       const eventRef = doc(db, "events", eventId);
       const eventSnap = await getDoc(eventRef);
 
@@ -48,13 +47,13 @@ export const dbService = {
       throw error;
     }
   },
-  async getProjects(){
+  async getProjects() {
     try {
       const projectRef = collection(db, "projects");
       const querySnapshot = await getDocs(projectRef);
-      const projects = []
-      querySnapshot.forEach((doc)=>{
-        projects.push({id: doc.id, ...doc.data()});
+      const projects = [];
+      querySnapshot.forEach((doc) => {
+        projects.push({ id: doc.id, ...doc.data() });
       });
       return projects;
     } catch (error) {
@@ -115,16 +114,16 @@ export const dbService = {
       throw error;
     }
   },
-  async getEventData(eventId){
+  async getEventData(eventId) {
     try {
       const eventDoc = await getDoc(doc(db, "events", eventId));
-      if(!eventDoc.exists()) return null;
+      if (!eventDoc.exists()) return null;
       return eventDoc.data();
     } catch (error) {
       throw error;
     }
   },
-  async getAdmEvents(){
+  async getAdmEvents() {
     try {
       const user = auth.currentUser;
       if (!user) throw new Error("Usuário não autenticado.");
@@ -134,8 +133,8 @@ export const dbService = {
       const querySnapshot = await getDocs(q);
 
       const events = [];
-      querySnapshot.forEach((doc)=>{
-        events.push({id: doc.id, ...doc.data() })
+      querySnapshot.forEach((doc) => {
+        events.push({ id: doc.id, ...doc.data() });
       });
 
       return events;
@@ -143,20 +142,20 @@ export const dbService = {
       throw error;
     }
   },
-    async getEvents(){
+  async getEvents() {
     try {
       const eventRef = collection(db, "events");
       const querySnapshot = await getDocs(eventRef);
-      const events = []
-      querySnapshot.forEach((doc)=>{
-        events.push({id: doc.id, ...doc.data()});
+      const events = [];
+      querySnapshot.forEach((doc) => {
+        events.push({ id: doc.id, ...doc.data() });
       });
       return events;
     } catch (error) {
       throw error;
     }
-  }, 
-  async createEvaluation(projectId, eventId, evaluation){
+  },
+  async createEvaluation(projectId, eventId, evaluation) {
     try {
       const user = auth.currentUser;
       if (!user) throw new Error("Usuário não autenticado.");
@@ -167,13 +166,27 @@ export const dbService = {
         evaluation: evaluation,
         evaluatorId: user.uid,
         createdAt: new Date(),
-      }
+      };
       const evaluationRef = collection(db, "evaluations");
       await addDoc(evaluationRef, newEvaluation);
     } catch (error) {
       throw error;
     }
+  },
+  async getEvaluationData(projectId) {
+    try {
+      const evaluationRef = collection(db, "evaluations");
+      const q = query(evaluationRef, where("projectId", "==", projectId));
+      const querySnapshot = await getDocs(q);
 
+      const evaluations = [];
+      querySnapshot.forEach((doc) => {
+        evaluations.push({ id: doc.id, ...doc.data() });
+      });
+      return evaluations;
+    } catch (error) {
+      throw error;
+    }
   },
   async getUserData() {
     try {

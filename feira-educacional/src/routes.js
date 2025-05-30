@@ -14,6 +14,9 @@ import CreateEventPage from "./pages/CreateEventPage";
 import EventListPage from "./pages/EventListPage";
 import EventDetailsPage from "./pages/EventDetailsPage";
 import PublicEventListPage from "./pages/PublicEventList";
+import EvaluationDetailsPage from "./pages/EvaluationDetailsPage";
+
+
 function RoutesApp() {
   return (
     <BrowserRouter>
@@ -24,6 +27,7 @@ function RoutesApp() {
         <Route path="/createEvent" element={<CreateEventPage/>} />
         <Route path="/myEvents" element={<EventListPage/>}/>
         <Route path="/events" element={<PublicEventListPage/>}/>
+        <Route path="/evaluationDetails/:id" element={<EvaluationDetailsPage/>}/>
 
         <Route element={<PublicOnlyRoute />}>
           <Route path="/start" element={<StartPage />} />

@@ -31,7 +31,7 @@ function App() {
   }, [dispatch]);
 
   if (isLoading) {
-    return <Loading/>;
+    return <Loading />;
   }
 
   return <RoutesApp />;

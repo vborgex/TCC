@@ -7,7 +7,7 @@ import { useParams,useNavigate } from "react-router-dom";
 import { dbService } from "../../service/dbService";
 import astronaut from "./../../assets/Astronaut3.svg";
 
-function EvaluationPage(props) {
+function EvaluationPage() {
   const { id } = useParams();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);

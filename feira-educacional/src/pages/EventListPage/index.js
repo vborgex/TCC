@@ -12,6 +12,7 @@ import EventCard from "../../components/eventCard";
 function EventListPage() {
   const [events, setEvents] = useState([]);
   const [search, setSearch] = useState("");
+  
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
