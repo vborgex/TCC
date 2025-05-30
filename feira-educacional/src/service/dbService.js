@@ -96,6 +96,7 @@ export const dbService = {
         criteria: phase.criteria
           .map((c) => c.value.trim())
           .filter((val) => val !== ""),
+        textAreas: phase.textAreas.map((t)=> t.value.trim()).filter((val)=> val!== ""),
         setSubmission: phase.setSubmission,
         numberApproved: phase.numberApproved,
       }));

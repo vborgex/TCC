@@ -4,12 +4,16 @@ import "./createPhase.css";
 function CreatePhase({
   id,
   criteria,
+  textAreas,
   numberApproved,
+  addPhaseTextAreas,
+  removePhaseTextAreas,
+  updatePhaseTextAreas,
   updatePhaseCriteria,
   addPhaseCriteria,
   removePhaseCriteria,
   handlePhaseFileSubmissionChange,
-  handlePhaseNumberApprovedBlur
+  handlePhaseNumberApprovedBlur,
 }) {
   return (
     <div className="row">
@@ -32,7 +36,7 @@ function CreatePhase({
         </button>
       </div>
 
-      <div className="col-12 mb-2">
+      <div className="col-6 mb-2">
         <div className="form-check">
           <input
             className="form-check-input"
@@ -45,6 +49,44 @@ function CreatePhase({
           </label>
         </div>
       </div>
+      
+      <div className="col-12 mb-2">
+        <label className="label">Campos de texto a serem preenchidos</label>
+        {textAreas.map((item, i) => (
+          <div key={i} className="d-flex mb-2">
+            <div className="w-100 d-flex flex-column flex-sm-row gap-2">
+              <input
+                type="text"
+                className="form-control"
+                placeholder={`Nome do campo ${i + 1}`}
+                value={textAreas[i].value}
+                onChange={(e) => updatePhaseTextAreas(id, i, e.target.value)}
+                maxLength="80"
+              />
+              <button
+                className="btn-remove"
+                onClick={() => removePhaseTextAreas(id, i)}
+                disabled={textAreas.length <= 1}
+                type="button"
+              >
+                Remover
+              </button>
+            </div>
+          </div>
+        ))}
+        <button
+          className="squareBtn p-1 w-100 fs-6 mb-3"
+          onClick={(e) => {
+            e.preventDefault();
+            addPhaseTextAreas(id);
+          }}
+          disabled={textAreas.length >= 3}
+        >
+          <i className="bi bi-plus me-2 flex-shrink-0"></i>
+          Adicionar campo de texto
+        </button>
+      </div>
+
       <div className="col-12 mb-2">
         <label className="label">Critérios de avaliação</label>
         {criteria.map((item, i) => (

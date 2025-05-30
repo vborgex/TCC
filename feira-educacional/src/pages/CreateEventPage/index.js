@@ -16,8 +16,14 @@ function CreateEventPage() {
   const [categories, setCategories] = useState([{ value: "" }]);
   const [educationLevels, setEducationLevels] = useState([{ value: "" }]);
   const [phases, setPhases] = useState([
-    { criteria: [{ value: "" }], setSubmission: false, numberApproved: "" },
+    {
+      textAreas: [{ value: "" }],
+      criteria: [{ value: "" }],
+      setSubmission: false,
+      numberApproved: "",
+    },
   ]);
+  console.log(phases);
   const [error, setError] = useState({
     title: "",
     description: "",
@@ -63,6 +69,50 @@ function CreateEventPage() {
     });
     setPhases(temp);
   };
+
+  const addPhaseTextAreas = (phaseIndex) => {
+    const temp = phases.map((phase, index) => {
+      if (index === phaseIndex) {
+        return {
+          ...phase,
+          textAreas: [...phase.textAreas, { value: "" }],
+        };
+      }
+      return phase;
+    });
+    setPhases(temp);
+  };
+
+  const updatePhaseTextAreas = (phaseIndex, textAreasIndex, criterion) => {
+    const temp = phases.map((phase, index) => {
+      if (index === phaseIndex) {
+        const newTextAreas = phase.textAreas.map((c, i) =>
+          i === textAreasIndex ? { value: criterion } : c
+        );
+        return { ...phase, textAreas: newTextAreas };
+      }
+      return phase;
+    });
+    setPhases(temp);
+  };
+
+  const removePhaseTextAreas = (phaseIndex, textAreasIndex) => {
+    const temp = phases.map((phase, index) => {
+      if (index === phaseIndex && phase.textAreas.length > 1) {
+        const newTextAreas = phase.textAreas.filter(
+          (_, i) => i !== textAreasIndex
+        );
+        return {
+          ...phase,
+          textAreas: newTextAreas,
+        };
+      }
+      return phase;
+    });
+    setPhases(temp);
+  };
+
+
 
   const addPhaseCriteria = (phaseIndex) => {
     const temp = phases.map((phase, index) => {
@@ -121,7 +171,7 @@ function CreateEventPage() {
   const addPhase = () => {
     setPhases([
       ...phases,
-      { criteria: [{ value: "" }], setSubmission: false, numberApproved: "" },
+      { textAreas: [{value: ""}], criteria: [{ value: "" }], setSubmission: false, numberApproved: "" },
     ]);
   };
 
@@ -255,11 +305,17 @@ function CreateEventPage() {
     }
 
     try {
-      await dbService.createEvent(title, description, filteredCategories, filteredEducationLevels, phases);
+      await dbService.createEvent(
+        title,
+        description,
+        filteredCategories,
+        filteredEducationLevels,
+        phases
+      );
       navigate("/home");
     } catch (err) {
       console.log(err);
-      setError((prev)=>({...prev, general: "Erro ao cadastrar o evento"}))
+      setError((prev) => ({ ...prev, general: "Erro ao cadastrar o evento" }));
     }
   };
 
@@ -459,13 +515,18 @@ function CreateEventPage() {
                       <CreatePhase
                         id={i}
                         criteria={phases[i].criteria}
+                        textAreas={phases[i].textAreas}
                         numberApproved={phases[i].numberApproved}
+                        addPhaseTextAreas={addPhaseTextAreas}
+                        updatePhaseTextAreas={updatePhaseTextAreas}
+                        removePhaseTextAreas={removePhaseTextAreas}
                         updatePhaseCriteria={updatePhaseCriteria}
                         addPhaseCriteria={addPhaseCriteria}
                         removePhaseCriteria={removePhaseCriteria}
                         handlePhaseFileSubmissionChange={
                           handlePhaseFileSubmissionChange
                         }
+                        f
                         handlePhaseNumberApprovedBlur={
                           handlePhaseNumberApprovedBlur
                         }
