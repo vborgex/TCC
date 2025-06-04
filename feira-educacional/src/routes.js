@@ -16,18 +16,20 @@ import EventDetailsPage from "./pages/EventDetailsPage";
 import PublicEventListPage from "./pages/PublicEventList";
 import EvaluationDetailsPage from "./pages/EvaluationDetailsPage";
 
-
 function RoutesApp() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/home" element={<HomePage />} />
         <Route path="/project/:id" element={<ProjectDetailsPage />} />
-        <Route path="/event/:id" element={<EventDetailsPage/>}/>
-        <Route path="/createEvent" element={<CreateEventPage/>} />
-        <Route path="/myEvents" element={<EventListPage/>}/>
-        <Route path="/events" element={<PublicEventListPage/>}/>
-        <Route path="/evaluationDetails/:id" element={<EvaluationDetailsPage/>}/>
+        <Route path="/event/:id" element={<EventDetailsPage />} />
+        <Route path="/createEvent" element={<CreateEventPage />} />
+        <Route path="/myEvents" element={<EventListPage />} />
+        <Route path="/events" element={<PublicEventListPage />} />
+        <Route
+          path="/evaluationDetails/:id"
+          element={<EvaluationDetailsPage />}
+        />
 
         <Route element={<PublicOnlyRoute />}>
           <Route path="/start" element={<StartPage />} />
@@ -37,13 +39,20 @@ function RoutesApp() {
         </Route>
 
         <Route element={<ProtectedRoute allowedRoutes={["ORIENTADOR"]} />}>
-          <Route path="/createProject/:id" element={<CreateProjectPage />} />
+          <Route
+            path="/createproject/:eventId"
+            element={<CreateProjectPage />}
+          />
+          <Route
+            path="/editproject/:eventId/:projectId"
+            element={<CreateProjectPage />}
+          />
+
           <Route path="/myProjects" element={<ProjectListPage />} />
         </Route>
         <Route element={<ProtectedRoute allowedRoutes={["AVALIADOR"]} />}>
           <Route path="/evaluate/:id" element={<EvaluationPage />} />
         </Route>
-
       </Routes>
     </BrowserRouter>
   );

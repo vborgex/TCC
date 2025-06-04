@@ -7,10 +7,19 @@ import {
   getDocs,
   query,
   where,
+  updateDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 
 export const dbService = {
-  async createProject(title, description, educationLevel, category, eventId) {
+  async createProject(
+    title,
+    description,
+    educationLevel,
+    category,
+    eventId,
+    phasesReplies
+  ) {
     try {
       const eventRef = doc(db, "events", eventId);
       const eventSnap = await getDoc(eventRef);
@@ -29,7 +38,8 @@ export const dbService = {
         category,
         creatorId: user.uid,
         eventId,
-        createdAt: new Date(),
+        phasesReplies,
+        createdAt: serverTimestamp(),
       };
 
       await addDoc(collection(db, "projects"), newProject);
@@ -37,7 +47,37 @@ export const dbService = {
       throw error;
     }
   },
-
+  async updateProject(
+    id,
+    title,
+    description,
+    educationLevel,
+    category,
+    phasesReplies
+  ) {
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error("Usuário não autenticado.");
+      const projectRef = doc(db, "projects", id);
+      const projectSnap = await getDoc(projectRef);
+      if (!projectSnap.exists()) {
+        throw new Error("Projeto não encontrado.");
+      }
+      if (projectSnap.data().ownerId !== user.uid) {
+        throw new Error("Você não tem permissão para editar esse projeto.");
+      }
+      await updateDoc(projectRef, {
+        title,
+        description,
+        educationLevel,
+        category,
+        phasesReplies,
+        updatedAt: serverTimestamp(),
+      });
+    } catch (error) {
+      throw error;
+    }
+  },
   async getProjectData(projectId) {
     try {
       const projectDoc = await getDoc(doc(db, "projects", projectId));
@@ -96,7 +136,9 @@ export const dbService = {
         criteria: phase.criteria
           .map((c) => c.value.trim())
           .filter((val) => val !== ""),
-        textAreas: phase.textAreas.map((t)=> t.value.trim()).filter((val)=> val!== ""),
+        textAreas: phase.textAreas
+          .map((t) => t.value.trim())
+          .filter((val) => val !== ""),
         setSubmission: phase.setSubmission,
         numberApproved: phase.numberApproved,
       }));

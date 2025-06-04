@@ -6,10 +6,11 @@ import Navbar from "../../components/navbar";
 import { dbService } from "../../service/dbService";
 import { useNavigate, useParams } from "react-router-dom";
 import astronaut from "./../../assets/Astronaut3.svg";
+import { AuthService } from "../../service/authService";
 import CreateProjectPhase from "../../components/createProjectPhase";
 
 function CreateProjectPage() {
-  const { id } = useParams();
+  const { eventId, projectId } = useParams();
   const [selectedEducationLevel, setSelectedEducationLevel] = useState(
     "Selecionar Nível de Escolaridade"
   );
@@ -18,10 +19,11 @@ function CreateProjectPage() {
   );
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
   const [fail, setFail] = useState(false);
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [phasesReplies, setPhasesReplies] = useState([]);
   const [error, setError] = useState({
     title: "",
     description: "",
@@ -31,13 +33,55 @@ function CreateProjectPage() {
     phases: "",
     general: "",
   });
-  console.log(event);
+
   useEffect(() => {
+    console.log("eventId:", eventId);
     async function fetchEvent() {
+      const user = await AuthService.getCurrentUser();
       try {
-        const resultado = await dbService.getEventData(id);
+        const resultado = await dbService.getEventData(eventId);
         if (resultado) {
           setEvent(resultado);
+          const initialPhases = resultado.phases.map((phase) => ({
+            textAreas: Array.isArray(phase.textAreas)
+              ? Object.fromEntries(phase.textAreas.map((label) => [label, ""]))
+              : {},
+            file: null,
+          }));
+          setPhasesReplies(initialPhases);
+          if (projectId) {
+            const projeto = await dbService.getProjectData(projectId);
+
+            if (!projeto) {
+              setFail(true);
+              return;
+            }
+
+            if (!user || projeto.creatorId !== user.uid) {
+              setFail(true);
+              return;
+            }
+
+            setIsEditing(true);
+
+            setTitle(projeto.title);
+            setDescription(projeto.description);
+            setSelectedCategory(projeto.category);
+            setSelectedEducationLevel(projeto.educationLevel);
+
+            const fasesSalvas = projeto.phasesReplies || [];
+            const newPhases = resultado.phases.map((phase, index) => ({
+              textAreas: Object.fromEntries(
+                (phase.textAreas || []).map((label) => [
+                  label,
+                  fasesSalvas[index]?.textAreas?.[label] || "",
+                ])
+              ),
+              file: fasesSalvas[index]?.file || null,
+            }));
+
+            setPhasesReplies(newPhases);
+          }
         } else {
           setFail(true);
         }
@@ -49,7 +93,7 @@ function CreateProjectPage() {
     }
 
     fetchEvent();
-  }, [id]);
+  }, [eventId, projectId]);
   const navigate = useNavigate();
 
   const handleCategorySelect = (category) => {
@@ -60,16 +104,23 @@ function CreateProjectPage() {
     setSelectedEducationLevel(educationLevel);
   };
 
-  const handleFileChange = (file) => {
+  const handlePhaseTextAreaChange = (value, index, label) => {
+    const newReplies = [...phasesReplies];
+    newReplies[index].textAreas[label] = value;
+    setPhasesReplies(newReplies);
+  };
+
+  const handleFileChange = (file, index) => {
     if (file && file.type === "application/pdf") {
-      setSelectedFile(file);
+      const newReplies = [...phasesReplies];
+      newReplies[index].file = file;
+      setPhasesReplies(newReplies);
       setError((prev) => ({ ...prev, file: "" }));
     } else {
       setError((prev) => ({
         ...prev,
         file: "Por favor selecione um arquivo tipo pdf",
       }));
-      setSelectedFile(null);
     }
   };
 
@@ -85,11 +136,22 @@ function CreateProjectPage() {
       general: "",
     });
 
+    const hasEmptyTextAreas = phasesReplies.some(
+      (response, i) =>
+        event.phases[i].textAreas.length > 0 &&
+        Object.values(response.textAreas).some((text) => text.trim() === "")
+    );
+
+    // const hasMissingFile = event.phases.some(
+    //   (phase, i) => phase.setSubmission && !phasesReplies[i].file
+    // );
+
     if (
       !title ||
       !description ||
       selectedCategory === "Selecionar Categoria" ||
-      selectedEducationLevel === "Selecionar Nível de Escolaridade"
+      selectedEducationLevel === "Selecionar Nível de Escolaridade" ||
+      hasEmptyTextAreas
     ) {
       setError((prev) => ({
         ...prev,
@@ -98,19 +160,33 @@ function CreateProjectPage() {
       return;
     }
     try {
-      await dbService.createProject(
-        title,
-        description,
-        selectedEducationLevel,
-        selectedCategory,
-        id
-      );
+      if (projectId) {
+        await dbService.updateProject(
+          projectId,
+          title,
+          description,
+          selectedEducationLevel,
+          selectedCategory,
+          phasesReplies
+        );
+      } else {
+        await dbService.createProject(
+          title,
+          description,
+          selectedEducationLevel,
+          selectedCategory,
+          eventId,
+          phasesReplies
+        );
+      }
+
       navigate("/myprojects");
     } catch (err) {
       console.log(err);
       setError((prev) => ({ ...prev, general: "Erro ao cadastrar o projeto" }));
     }
   };
+
   return (
     <div className="background min-vh-100 overflow-auto p-0">
       <Navbar />
@@ -122,12 +198,25 @@ function CreateProjectPage() {
             </div>
           ) : fail ? (
             <div className="d-flex flex-column justify-content-center align-items-center">
-              <h5>Evento não encontrado!</h5>
-              <img
-                src={astronaut}
-                className="align-self-center w-50 h-auto"
-                alt="..."
-              />
+              {event ? (
+                <>
+                  <h5>Você não tem permissão para editar esse projeto.</h5>
+                  <img
+                    src={astronaut}
+                    className="align-self-center w-50 h-auto"
+                    alt="..."
+                  />
+                </>
+              ) : (
+                <>
+                  <h5>Evento não encontrado!</h5>
+                  <img
+                    src={astronaut}
+                    className="align-self-center w-50 h-auto"
+                    alt="..."
+                  />
+                </>
+              )}
             </div>
           ) : (
             <>
@@ -144,8 +233,10 @@ function CreateProjectPage() {
                       className="form-control mb-2"
                       id="projectName"
                       placeholder="Nome do projeto"
+                      value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       maxLength="100"
+                      disabled={isEditing}
                     />
                     {error.title && (
                       <p className="text-danger">{error.title}</p>
@@ -166,6 +257,8 @@ function CreateProjectPage() {
                       placeholder="Escreva um resumo do projeto..."
                       rows="4"
                       maxLength="600"
+                      value={description}
+                      disabled={isEditing}
                       onChange={(e) => setDescription(e.target.value)}
                     ></textarea>
                     {error.description && (
@@ -183,6 +276,7 @@ function CreateProjectPage() {
                       id="dropdownMenuButton"
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
+                      disabled={isEditing}
                     >
                       {selectedEducationLevel}
                     </button>
@@ -215,6 +309,7 @@ function CreateProjectPage() {
                       id="dropdownMenuButton"
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
+                      disabled={isEditing}
                     >
                       {selectedCategory}
                     </button>
@@ -248,20 +343,32 @@ function CreateProjectPage() {
                       <label className="label mb-2 fs-4">{`Fase ${
                         index + 1
                       }`}</label>
-                      {phase.textAreas.map((area, index) => (
-                        <div className="col-12 d-flex flex-column align-items-start">
-                          <label className="label mb-2">
-                            {area}
-                          </label>
+
+                      {Object.entries(
+                        phasesReplies[index]?.textAreas || {}
+                      ).map(([label, value]) => (
+                        <div
+                          className="col-12 d-flex flex-column align-items-start"
+                          key={label}
+                        >
+                          <label className="label mb-2">{label}</label>
                           <textarea
                             className="form-control mb-2"
-                            id="projectSummary"
                             placeholder="..."
                             rows="4"
                             maxLength="600"
-                          ></textarea>
+                            value={value}
+                            onChange={(e) =>
+                              handlePhaseTextAreaChange(
+                                e.target.value,
+                                index,
+                                label
+                              )
+                            }
+                          />
                         </div>
                       ))}
+
                       {phase.setSubmission ? (
                         <div className="col-12 d-flex flex-column align-items-start">
                           <label
@@ -271,20 +378,22 @@ function CreateProjectPage() {
                           >
                             <i className="bi bi-file-earmark-arrow-up me-2 flex-shrink-0"></i>
                             <span className="text-truncate">
-                              {selectedFile
-                                ? "Arquivo selecionado: " + selectedFile.name
+                              {phasesReplies[index]?.file
+                                ? "Arquivo selecionado: " +
+                                  phasesReplies[index].file.name
                                 : "Adicionar Anexo"}
                             </span>
                           </label>
                           <input
                             type="file"
-                            id="fileInput"
+                            id={`fileInput-${index}`}
                             accept="application/pdf"
                             style={{ display: "none" }}
                             onChange={(e) =>
-                              handleFileChange(e.target.files[0])
+                              handleFileChange(e.target.files[0], index)
                             }
                           />
+
                           {error.file && (
                             <p className="text-danger">{error.file}</p>
                           )}

@@ -30,6 +30,15 @@ export const AuthService = {
       throw error;
     }
   },
+  async getCurrentUser(){
+    try {
+      const user = await auth.currentUser;
+      return user;
+      } catch (error) {
+        console.log(error)
+        throw error;
+      }
+  },
 
   async login(email, password, rememberMe = false) {
     try {
