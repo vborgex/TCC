@@ -24,6 +24,7 @@ function RoutesApp() {
         <Route path="/project/:id" element={<ProjectDetailsPage />} />
         <Route path="/event/:id" element={<EventDetailsPage />} />
         <Route path="/createEvent" element={<CreateEventPage />} />
+        <Route path="/editEvent/:eventId" element={<CreateEventPage/>}/>
         <Route path="/myEvents" element={<EventListPage />} />
         <Route path="/events" element={<PublicEventListPage />} />
         <Route

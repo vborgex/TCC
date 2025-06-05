@@ -131,17 +131,17 @@ export const dbService = {
       const educationLevelsToSave = educationLevels
         .map((level) => level.value.trim())
         .filter((val) => val !== "");
-
       const phasesToSave = phases.map((phase) => ({
         criteria: phase.criteria
-          .map((c) => c.value.trim())
-          .filter((val) => val !== ""),
+          .map((c) => (c && c.value ? c.value.trim() : null))
+          .filter((val) => val !== null && val !== ""),
         textAreas: phase.textAreas
-          .map((t) => t.value.trim())
-          .filter((val) => val !== ""),
+          .map((t) => (t && t.value ? t.value.trim() : null))
+          .filter((val) => val !== null && val !== ""),
         setSubmission: phase.setSubmission,
         numberApproved: phase.numberApproved,
       }));
+
       const newEvent = {
         title,
         description,
@@ -153,6 +153,54 @@ export const dbService = {
       };
 
       await addDoc(collection(db, "events"), newEvent);
+    } catch (error) {
+      throw error;
+    }
+  },
+  async updateEvent(
+    id,
+    title,
+    description,
+    categories,
+    educationLevels,
+    phases
+  ) {
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error("Usuário não autenticado.");
+      const eventRef = doc(db, "events", id);
+      const eventSnap = await getDoc(eventRef);
+      if (!eventSnap.exists()) {
+        throw new Error("Evento não encontrado");
+      }
+      if (eventSnap.data().creatorId !== user.uid) {
+        throw new Error("Você não tem permissão para editar esse evento.");
+      }
+      const categoriesToSave = categories
+        .map((cat) => cat.value.trim())
+        .filter((val) => val !== "");
+      const educationLevelsToSave = educationLevels
+        .map((level) => level.value.trim())
+        .filter((val) => val !== "");
+      const phasesToSave = phases.map((phase) => ({
+        criteria: phase.criteria
+          .map((c) => (c && c.value ? c.value.trim() : null))
+          .filter((val) => val !== null && val !== ""),
+        textAreas: phase.textAreas
+          .map((t) => (t && t.value ? t.value.trim() : null))
+          .filter((val) => val !== null && val !== ""),
+        setSubmission: phase.setSubmission,
+        numberApproved: phase.numberApproved,
+      }));
+
+      await updateDoc(eventRef, {
+        title,
+        description,
+        categories: categoriesToSave,
+        educationLevels: educationLevelsToSave,
+        phases: phasesToSave,
+        updatedAt: new Date(),
+      });
     } catch (error) {
       throw error;
     }

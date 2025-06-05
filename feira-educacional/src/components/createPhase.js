@@ -1,10 +1,11 @@
-import { useState } from "react";
 import "./createPhase.css";
+import { useEffect, useState } from "react";
 
 function CreatePhase({
   id,
   criteria,
   textAreas,
+  setSubmission,
   numberApproved,
   addPhaseTextAreas,
   removePhaseTextAreas,
@@ -15,6 +16,22 @@ function CreatePhase({
   handlePhaseFileSubmissionChange,
   handlePhaseNumberApprovedBlur,
 }) {
+  console.log(criteria);
+  const [localNumberApproved, setLocalNumberApproved] = useState(
+    numberApproved || ""
+  );
+
+  useEffect(() => {
+    setLocalNumberApproved(numberApproved || "");
+  }, [numberApproved]);
+
+  const handleChange = (e) => {
+    setLocalNumberApproved(e.target.value);
+  };
+  const handleBlur = (e) => {
+    handlePhaseNumberApprovedBlur(id, e);
+  };
+
   return (
     <div className="row">
       <div className="col-12 mb-2">
@@ -43,13 +60,14 @@ function CreatePhase({
             type="checkbox"
             id="fileSubmit"
             onChange={() => handlePhaseFileSubmissionChange(id)}
+            checked={setSubmission}
           />
           <label className="form-check-label" htmlFor="fileSubmit">
             Submissão de arquivo
           </label>
         </div>
       </div>
-      
+
       <div className="col-12 mb-2">
         <label className="label">Campos de texto a serem preenchidos</label>
         {textAreas.map((item, i) => (
@@ -128,12 +146,14 @@ function CreatePhase({
         <label className="label mb-2">Quantia de aprovados</label>
         <div className="input w-50">
           <input
+            value={localNumberApproved}
             className="form-control mb-2 no-spinner"
             id="projectGrade"
             placeholder="Digite um número"
             type="number"
             min="0"
-            onBlur={(e)=> handlePhaseNumberApprovedBlur(id, e)}
+            onChange={handleChange}
+            onBlur={handleBlur}
           />
         </div>
       </div>
