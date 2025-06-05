@@ -17,4 +17,18 @@ export const storageService = {
       console.log("Arquivos:", files);
     }
   },
+  async uploadFile (file, folder) {
+    const filePathBucket = `${folder}/${Date.now()}_${file.name}`;
+  const { data, error } = await supabase.storage
+    .from('files')
+    .upload(filePathBucket, file);
+
+  if (error) {
+    console.error("Erro no upload:", error);
+    return null;
+  }
+
+  return data; 
+},
+
 };
