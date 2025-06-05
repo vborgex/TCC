@@ -1,15 +1,20 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import React  from "react";
+import React, { useEffect }  from "react";
 import "./index.css";
 import astronaut from "./../../assets/Astronaut2.svg";
 import NavBar from "./../../components/navbar";
 import { useSelector } from "react-redux";
+import { storageService } from "../../service/storageService";
 
 function HomePage() {
   const isLoggedIn = useSelector((state) => state.usuario.usuarioLogado) > 0;
   const userRole = useSelector((state) => state.usuario.usuarioRole);
   const userName = useSelector((state)=> state.usuario.usuarioNome);
+  useEffect(()=>{
+
+  storageService.listarArquivos();
+  },[])
   return (
     <div className="background-home min-vh-100 overflow-auto p-0">
       <NavBar />
