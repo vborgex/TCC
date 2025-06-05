@@ -350,7 +350,7 @@ function CreateEventPage() {
       let fileMetadata = null;
 
       if (rulesFile) {
-        const fileMetadata = await storageService.uploadFile(rulesFile, "events");
+        fileMetadata = await storageService.uploadFile(rulesFile, "events");
         console.log("Metadados:", fileMetadata);
       }
       if (eventId) {
