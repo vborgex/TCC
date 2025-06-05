@@ -120,7 +120,7 @@ export const dbService = {
     }
   },
 
-  async createEvent(title, description, categories, educationLevels, phases) {
+  async createEvent(title, description, categories, educationLevels, phases, fileMetadata) {
     try {
       const user = auth.currentUser;
       if (!user) throw new Error("Usuário não autenticado.");
@@ -150,6 +150,7 @@ export const dbService = {
         phases: phasesToSave,
         creatorId: user.uid,
         createdAt: new Date(),
+        fileMetadata
       };
 
       await addDoc(collection(db, "events"), newEvent);
@@ -163,7 +164,8 @@ export const dbService = {
     description,
     categories,
     educationLevels,
-    phases
+    phases,
+    fileMetadata
   ) {
     try {
       const user = auth.currentUser;
@@ -200,6 +202,7 @@ export const dbService = {
         educationLevels: educationLevelsToSave,
         phases: phasesToSave,
         updatedAt: new Date(),
+        fileMetadata
       });
     } catch (error) {
       throw error;
