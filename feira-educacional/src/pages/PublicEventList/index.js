@@ -64,6 +64,7 @@ function PublicEventListPage() {
             <div className="row">
               {filteredEvents.map((item) => (
                 <EventCard
+                  img = {item.imgMetadata.url}
                   id={item.id}
                   titulo={item.title}
                   status={"ok"}

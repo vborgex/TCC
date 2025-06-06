@@ -3,12 +3,12 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { Link } from "react-router-dom";
 import "./eventCard.css";
 
-function EventCard({ id, titulo, status, description }) {
+function EventCard({img, id, titulo, status, description }) {
   return (
-    
+    // "https://placehold.co/600x400"
     <div className="div col-md-3 col-sm-12  p-1">
-      <Link to={"/event/" + id} className="card text-decoration-none">
-        <img src="https://placehold.co/600x400" className="card-img-top card-img object-fit-cover" alt="..."/>
+      <Link to={"/event/" + id} className="card card-card text-decoration-none">
+        <img src={img} className="card-img-top card-img object-fit-cover" alt="..."/>
         <div className="card-body">
           <h5 id="projectTitle" className="project-title text-truncate">
             {titulo}

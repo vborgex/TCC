@@ -7,6 +7,7 @@ function CreatePhase({
   textAreas,
   setSubmission,
   numberApproved,
+  isSubmitting,
   addPhaseTextAreas,
   removePhaseTextAreas,
   updatePhaseTextAreas,
@@ -40,14 +41,14 @@ function CreatePhase({
 
       <div className="col-12 col-md-6 mb-2">
         <label className="label">Submissão</label>
-        <button className="btn squareBtn p-1 w-100">
+        <button className="btn squareBtn p-1 w-100" disabled = {isSubmitting}>
           <i className="bi bi-calendar-range me-2 flex-shrink-0"></i>
           Adicionar data
         </button>
       </div>
       <div className="col-12 col-md-6 mb-2">
         <label className="label">Avaliação</label>
-        <button className="btn squareBtn p-1 w-100">
+        <button className="btn squareBtn p-1 w-100" disabled = {isSubmitting}>
           <i className="bi bi-calendar-range me-2 flex-shrink-0"></i>
           Adicionar data
         </button>
@@ -61,6 +62,7 @@ function CreatePhase({
             id="fileSubmit"
             onChange={() => handlePhaseFileSubmissionChange(id)}
             checked={setSubmission}
+            disabled = {isSubmitting}
           />
           <label className="form-check-label" htmlFor="fileSubmit">
             Submissão de arquivo
@@ -80,12 +82,14 @@ function CreatePhase({
                 value={textAreas[i].value}
                 onChange={(e) => updatePhaseTextAreas(id, i, e.target.value)}
                 maxLength="80"
+                disabled = {isSubmitting}
               />
               <button
                 className="btn-remove"
                 onClick={() => removePhaseTextAreas(id, i)}
-                disabled={textAreas.length <= 1}
+                disabled={textAreas.length <= 1 || isSubmitting}
                 type="button"
+                
               >
                 Remover
               </button>
@@ -98,7 +102,7 @@ function CreatePhase({
             e.preventDefault();
             addPhaseTextAreas(id);
           }}
-          disabled={textAreas.length >= 3}
+          disabled={textAreas.length >= 5 || isSubmitting}
         >
           <i className="bi bi-plus me-2 flex-shrink-0"></i>
           Adicionar campo de texto
@@ -117,12 +121,14 @@ function CreatePhase({
                 value={criteria[i].value}
                 onChange={(e) => updatePhaseCriteria(id, i, e.target.value)}
                 maxLength="80"
+                disabled = {isSubmitting}
               />
               <button
                 className="btn-remove"
                 onClick={() => removePhaseCriteria(id, i)}
-                disabled={criteria.length <= 1}
+                disabled={criteria.length <= 1 || isSubmitting}
                 type="button"
+                
               >
                 Remover
               </button>
@@ -135,7 +141,7 @@ function CreatePhase({
             e.preventDefault();
             addPhaseCriteria(id);
           }}
-          disabled={criteria.length >= 11}
+          disabled={criteria.length >= 11 || isSubmitting}
         >
           <i className="bi bi-plus me-2 flex-shrink-0"></i>
           Adicionar critério
@@ -154,6 +160,7 @@ function CreatePhase({
             min="0"
             onChange={handleChange}
             onBlur={handleBlur}
+            disabled = {isSubmitting}
           />
         </div>
       </div>

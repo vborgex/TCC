@@ -39,7 +39,6 @@ export const AuthService = {
         throw error;
       }
   },
-
   async login(email, password, rememberMe = false) {
     try {
       await setPersistence(

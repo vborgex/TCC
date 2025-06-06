@@ -120,7 +120,7 @@ export const dbService = {
     }
   },
 
-  async createEvent(title, description, categories, educationLevels, phases, fileMetadata) {
+  async createEvent(title, description, categories, educationLevels, phases, fileMetadata, imgMetadata) {
     try {
       const user = auth.currentUser;
       if (!user) throw new Error("Usuário não autenticado.");
@@ -150,7 +150,8 @@ export const dbService = {
         phases: phasesToSave,
         creatorId: user.uid,
         createdAt: new Date(),
-        fileMetadata
+        fileMetadata,
+        imgMetadata
       };
 
       await addDoc(collection(db, "events"), newEvent);
@@ -165,7 +166,8 @@ export const dbService = {
     categories,
     educationLevels,
     phases,
-    fileMetadata
+    fileMetadata, 
+    imgMetadata
   ) {
     try {
       const user = auth.currentUser;
@@ -184,25 +186,16 @@ export const dbService = {
       const educationLevelsToSave = educationLevels
         .map((level) => level.value.trim())
         .filter((val) => val !== "");
-      const phasesToSave = phases.map((phase) => ({
-        criteria: phase.criteria
-          .map((c) => (c && c.value ? c.value.trim() : null))
-          .filter((val) => val !== null && val !== ""),
-        textAreas: phase.textAreas
-          .map((t) => (t && t.value ? t.value.trim() : null))
-          .filter((val) => val !== null && val !== ""),
-        setSubmission: phase.setSubmission,
-        numberApproved: phase.numberApproved,
-      }));
 
       await updateDoc(eventRef, {
         title,
         description,
         categories: categoriesToSave,
         educationLevels: educationLevelsToSave,
-        phases: phasesToSave,
+        phases: phases,
         updatedAt: new Date(),
-        fileMetadata
+        fileMetadata,
+        imgMetadata
       });
     } catch (error) {
       throw error;

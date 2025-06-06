@@ -17,8 +17,11 @@ function CreateEventPage() {
   const [description, setDescription] = useState("");
   const [rulesFile, setRulesFile] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const [existingRulesFile, setExistingRulesFile] = useState(null);
+  const [existingImageFile, setExistingImageFile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [fail, setFail] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [categories, setCategories] = useState([{ value: "" }]);
   const [educationLevels, setEducationLevels] = useState([{ value: "" }]);
@@ -31,6 +34,7 @@ function CreateEventPage() {
       numberApproved: "",
     },
   ]);
+  console.log("Phases:", phases)
   const [error, setError] = useState({
     title: "",
     description: "",
@@ -62,6 +66,10 @@ function CreateEventPage() {
           setPhases(resultado.phases);
           setTitle(resultado.title);
           setDescription(resultado.description);
+          setExistingImageFile(resultado.imgMetadata);
+          setExistingRulesFile(resultado.fileMetadata);
+          setImageFile(resultado.imgMetadata);
+          setRulesFile(resultado.fileMetadata);
           setCategories(
             resultado.categories.map((category) => ({ value: category }))
           );
@@ -108,7 +116,11 @@ function CreateEventPage() {
     });
     setPhases(temp);
   };
-
+const isFileDirty = (newFile, existingFile) => {
+  if (!newFile && !existingFile) return false;
+  if (!newFile || !existingFile) return true;
+  return newFile.name !== existingFile.name || newFile.size !== existingFile.size;
+};
   const addPhaseTextAreas = (phaseIndex) => {
     const temp = phases.map((phase, index) => {
       if (index === phaseIndex) {
@@ -239,13 +251,13 @@ function CreateEventPage() {
   };
 
   const handleImageFileChange = (file) => {
-    if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
+    if (file && (file.type === "image/jpeg")) {
       setImageFile(file);
       setError((prev) => ({ ...prev, imageFile: "" }));
     } else {
       setError((prev) => ({
         ...prev,
-        imageFile: "Por favor selecione um arquivo tipo jpeg ou png",
+        imageFile: "Por favor selecione um arquivo tipo jpeg",
       }));
       setImageFile(null);
     }
@@ -345,14 +357,29 @@ function CreateEventPage() {
       }));
       return;
     }
-
+    setIsSubmitting(true);
     try {
+      console.log("Phases before update", phases);
       let fileMetadata = null;
-
-      if (rulesFile) {
+      let imgMetadata = null;
+      if (isFileDirty(rulesFile, existingRulesFile)) {
+        if (isEditing && existingRulesFile.path) {
+          await storageService.deleteFile(event.fileMetadata.path);
+        }
         fileMetadata = await storageService.uploadFile(rulesFile, "events");
-        console.log("Metadados:", fileMetadata);
+      }else{
+        fileMetadata = existingRulesFile
       }
+
+      if (isFileDirty(imageFile, existingImageFile)) {
+        if (isEditing && existingImageFile.path) {
+          await storageService.deleteFile(event.imgMetadata.path);
+        }
+        imgMetadata = await storageService.uploadFile(imageFile, "banners");
+      }else{
+        imgMetadata = existingImageFile
+      }
+
       if (eventId) {
         await dbService.updateEvent(
           eventId,
@@ -361,7 +388,8 @@ function CreateEventPage() {
           filteredCategories,
           filteredEducationLevels,
           phases,
-          fileMetadata
+          fileMetadata,
+          imgMetadata
         );
       } else {
         await dbService.createEvent(
@@ -370,11 +398,13 @@ function CreateEventPage() {
           filteredCategories,
           filteredEducationLevels,
           phases,
-          fileMetadata
+          fileMetadata,
+          imgMetadata
         );
       }
       navigate("/home");
     } catch (err) {
+      setIsSubmitting(false);
       console.log(err);
       setError((prev) => ({ ...prev, general: "Erro ao cadastrar o evento" }));
     }
@@ -416,7 +446,10 @@ function CreateEventPage() {
         <div className=" d-flex p-2 justify-content-center">
           <div className="card-create-project p-3 w-100 max-w-900 mt-4 mb-4">
             <div className="text-center text-uppercase">
-              <h2 id="eventName">Criar Evento</h2>
+              {isEditing ? (
+              <h2 id="eventName">Editar Evento</h2>
+              ): (
+              <h2 id="eventName">Criar Evento</h2>)}
             </div>
             <form onSubmit={onSubmit}>
               <div className="row justify-content-start align-items-end">
@@ -424,10 +457,11 @@ function CreateEventPage() {
                   <label className="label mb-2">Nome do evento</label>
                   <input
                     className="form-control mb-2"
-                    placeholder="Nome do projeto"
+                    placeholder="Nome do evento"
                     onChange={(e) => setTitle(e.target.value)}
                     maxLength="100"
                     value={title}
+                    disabled = {isSubmitting}
                   />
                   {error.title && (
                     <p className="text-danger fs-6">{error.title}</p>
@@ -440,10 +474,11 @@ function CreateEventPage() {
                     className="form-control mb-2"
                     value={description}
                     id="eventSummary"
-                    placeholder="Escreva um resumo do projeto..."
+                    placeholder="Escreva um resumo do evento..."
                     rows="4"
                     maxLength="600"
                     onChange={(e) => setDescription(e.target.value)}
+                    disabled = {isSubmitting}
                   ></textarea>
                   {error.description && (
                     <p className="text-danger fs-6">{error.description}</p>
@@ -469,13 +504,14 @@ function CreateEventPage() {
                             )
                           }
                           maxLength="80"
+                          disabled = {isSubmitting}
                         />
                         <button
                           className="btn-remove"
                           onClick={() =>
                             removeInput(categories, setCategories, i)
                           }
-                          disabled={categories.length <= 1}
+                          disabled={categories.length <= 1 || isSubmitting}
                           type="button"
                         >
                           Remover
@@ -489,7 +525,7 @@ function CreateEventPage() {
                       e.preventDefault();
                       addInput(categories, setCategories);
                     }}
-                    disabled={categories.length >= 10}
+                    disabled={categories.length >= 10 ||isSubmitting}
                   >
                     <i className="bi bi-plus me-2 flex-shrink-0"></i>
                     Adicionar categoria
@@ -518,13 +554,14 @@ function CreateEventPage() {
                             )
                           }
                           maxLength="80"
+                          disabled = {isSubmitting}
                         />
                         <button
                           className="btn-remove"
                           onClick={() =>
                             removeInput(educationLevels, setEducationLevels, i)
                           }
-                          disabled={educationLevels.length <= 1}
+                          disabled={educationLevels.length <= 1 || isSubmitting}
                           type="button"
                         >
                           Remover
@@ -538,7 +575,7 @@ function CreateEventPage() {
                       e.preventDefault();
                       addInput(educationLevels, setEducationLevels);
                     }}
-                    disabled={educationLevels.length >= 5}
+                    disabled={educationLevels.length >= 5 ||isSubmitting}
                   >
                     <i className="bi bi-plus me-2 flex-shrink-0"></i>
                     Adicionar nível
@@ -548,12 +585,13 @@ function CreateEventPage() {
                   )}
                 </div>
 
-                <div className="col-12 d-flex flex-column align-items-start">
+                <div className="col-12 d-flex flex-column align-items-start" disabled = {isSubmitting}>
                   <label className="label mb-2">Banner do evento</label>
                   <label
                     className="btn btn-custom btn-regulamento mb-2 d-flex align-items-center text-truncate w-100"
                     htmlFor="fileInputImg"
                     style={{ cursor: "pointer" }}
+                    disabled = {isSubmitting}
                   >
                     <i className="bi bi-file-earmark-arrow-up me-2 flex-shrink-0"></i>
                     <span className="text-truncate">
@@ -569,6 +607,7 @@ function CreateEventPage() {
                     accept=" image/*"
                     style={{ display: "none" }}
                     onChange={(e) => handleImageFileChange(e.target.files[0])}
+                    disabled = {isSubmitting}
                   />
                   {error.file && (
                     <p className="text-danger fs-6">{error.imageFile}</p>
@@ -580,6 +619,7 @@ function CreateEventPage() {
                     className="btn btn-custom btn-regulamento mb-2 d-flex align-items-center text-truncate w-100"
                     htmlFor="fileInputPdf"
                     style={{ cursor: "pointer" }}
+                    disabled = {isSubmitting}
                   >
                     <i className="bi bi-file-earmark-arrow-up me-2 flex-shrink-0"></i>
                     <span className="text-truncate">
@@ -595,6 +635,7 @@ function CreateEventPage() {
                     accept="application/pdf"
                     style={{ display: "none" }}
                     onChange={(e) => handleRulesFileChange(e.target.files[0])}
+                    disabled = {isSubmitting}
                   />
                   {error.file && (
                     <p className="text-danger fs-6">{error.rulesFile}</p>
@@ -619,6 +660,7 @@ function CreateEventPage() {
                           }
                           setSubmission={phases[i].setSubmission}
                           numberApproved={phases[i].numberApproved}
+                          isSubmitting = {isSubmitting}
                           addPhaseTextAreas={addPhaseTextAreas}
                           updatePhaseTextAreas={updatePhaseTextAreas}
                           removePhaseTextAreas={removePhaseTextAreas}
@@ -639,7 +681,7 @@ function CreateEventPage() {
                             e.preventDefault();
                             removeInput(phases, setPhases, i);
                           }}
-                          disabled={phases.length <= 1}
+                          disabled={phases.length <= 1 ||isSubmitting}
                         >
                           <i className="bi bi-x me-2 flex-shrink-0"></i>
                           {`REMOVER FASE ${i + 1}`}
@@ -652,7 +694,7 @@ function CreateEventPage() {
                         e.preventDefault();
                         addPhase();
                       }}
-                      disabled={phases.length >= 5}
+                      disabled={phases.length >= 5 ||isSubmitting}
                     >
                       <i className="bi bi-plus me-2 flex-shrink-0"></i>
                       ADICIONAR FASE
@@ -663,12 +705,13 @@ function CreateEventPage() {
                   )}
 
                   <div className="d-flex gap-2 mt-5 mb-3">
-                    <button className="btn btn-cancelar rounded-pill flex-fill">
+                    <button className="btn btn-cancelar rounded-pill flex-fill" disabled = {isSubmitting}>
                       Cancelar
                     </button>
                     <button
                       type="submit"
                       className="btn btn-confirmar rounded-pill flex-fill"
+                      disabled = {isSubmitting}
                     >
                       Confirmar
                     </button>
