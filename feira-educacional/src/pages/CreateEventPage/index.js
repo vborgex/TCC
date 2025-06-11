@@ -3,7 +3,6 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import React, { useEffect, useState } from "react";
 import "./index.css";
 import Navbar from "../../components/navbar";
-import { useSelector } from "react-redux";
 import { dbService } from "../../service/dbService";
 import { useNavigate, useParams } from "react-router-dom";
 import CreatePhase from "../../components/createPhase";
@@ -11,6 +10,10 @@ import { AuthService } from "../../service/authService";
 import Loading from "../../components/loading";
 import astronaut from "./../../assets/Astronaut3.svg";
 import { storageService } from "../../service/storageService";
+import DatePicker from "react-datepicker";
+import { format } from "date-fns";
+import "react-datepicker/dist/react-datepicker.css";
+
 function CreateEventPage() {
   const { eventId } = useParams();
   const [title, setTitle] = useState("");
@@ -26,6 +29,8 @@ function CreateEventPage() {
   const [categories, setCategories] = useState([{ value: "" }]);
   const [educationLevels, setEducationLevels] = useState([{ value: "" }]);
   const [event, setEvent] = useState(null);
+  const [enrollmentRange, setEnrollmentRange] = useState([null, null]);
+  const [startEnroll, endEnroll] = enrollmentRange;
   const [evaluators, setEvaluators] = useState([{ value: "" }]);
   const [phases, setPhases] = useState([
     {
@@ -33,10 +38,17 @@ function CreateEventPage() {
       criteria: [{ value: "" }],
       setSubmission: false,
       numberApproved: "",
+      submissionRange: [null, null],
+      evaluationRange: [null, null],
     },
   ]);
 
-  console.log("CreateEventPage re-renderizou!");
+  const normalizeRange = (range = [null, null]) =>
+    range.map((d) =>
+      d && typeof d === "object" && "toDate" in d ? d.toDate() : d
+    );
+
+  console.log("Phases", phases);
   const [error, setError] = useState({
     title: "",
     description: "",
@@ -46,6 +58,7 @@ function CreateEventPage() {
     educationLevels: "",
     phases: "",
     general: "",
+    enroll: "",
   });
 
   useEffect(() => {
@@ -80,12 +93,13 @@ function CreateEventPage() {
               value: educationLevel,
             }))
           );
+          setEnrollmentRange(normalizeRange(resultado.enrollmentRange));
           const evaluatorEmails = await Promise.all(
             resultado.evaluators.map(async (evaluatorId) => {
               const userDoc = await dbService.getUserDataById(evaluatorId);
-                return { value: userDoc?.email || "" };
-              })
-            );
+              return { value: userDoc?.email || "" };
+            })
+          );
           setEvaluators(evaluatorEmails);
         }
       } catch (error) {
@@ -125,6 +139,19 @@ function CreateEventPage() {
     });
     setPhases(temp);
   };
+
+  const handleSubmissionRangeChange = (phaseIndex, range) => {
+    const temp = [...phases];
+    temp[phaseIndex].submissionRange = range;
+    setPhases(temp);
+  };
+
+  const handleEvaluationRangeChange = (phaseIndex, range) => {
+    const temp = [...phases];
+    temp[phaseIndex].evaluationRange = range;
+    setPhases(temp);
+  };
+
   const isFileDirty = (newFile, existingFile) => {
     if (!newFile && !existingFile) return false;
     if (!newFile || !existingFile) return true;
@@ -236,6 +263,8 @@ function CreateEventPage() {
         criteria: [{ value: "" }],
         setSubmission: false,
         numberApproved: "",
+        submissionRange: [null, null],
+        evaluationRange: [null, null],
       },
     ]);
   };
@@ -286,11 +315,13 @@ function CreateEventPage() {
       evaluators: "",
       phases: "",
       general: "",
+      enroll: "",
     });
 
     const filteredCategories = categories.filter(
       (category) => category.value !== ""
     );
+
     const filteredEducationLevels = educationLevels.filter(
       (level) => level.value !== ""
     );
@@ -303,39 +334,51 @@ function CreateEventPage() {
     const evaluatorsEmpty = filteredEvaluators.length === 0;
 
     const phasesWithErrors = phases
-      .map((phase, index) => {
-        const hasCriteria = phase.criteria.some(
-          (criterion) => criterion.value !== ""
-        );
-        const isNumberApprovedFilled = phase.numberApproved !== "";
-        if (!hasCriteria && !isNumberApprovedFilled) {
-          return `A fase ${
-            index + 1
-          } deve ter pelo menos um critério de avaliação e o campo de quantidade de alunos preenchido.`;
-        }
-        if (!hasCriteria && isNumberApprovedFilled) {
-          return `A fase ${
-            index + 1
-          } deve ter pelo menos um critério de avaliação preenchido.`;
-        }
-        if (hasCriteria && !isNumberApprovedFilled) {
-          return `A fase ${
-            index + 1
-          } deve ter o campo de quantidade de alunos preenchido.`;
-        }
-        return null;
-      })
-      .filter((error) => error !== null);
+  .map((phase, index) => {
+    const hasCriteria = phase.criteria.some(
+      (criterion) => criterion.value !== ""
+    );
 
+    const isNumberApprovedFilled = phase.numberApproved !== "";
+
+    const areRangesFilled = (!phase.evaluationRange.includes(null) && !phase.submissionRange.includes(null))
+
+    const errors = [];
+
+    if (!hasCriteria) {
+      errors.push(
+        `A fase ${index + 1} deve ter pelo menos um critério de avaliação.`
+      );
+    }
+
+    if (!isNumberApprovedFilled) {
+      errors.push(
+        `A fase ${index + 1} deve ter o campo de quantidade de alunos preenchido.`
+      );
+    }
+
+    if (!areRangesFilled) {
+      errors.push(
+        `A fase ${index + 1} deve ter os campos de intervalo de avaliação e submissão preenchidos.`
+      );
+    }
+
+    return errors.length > 0 ? errors : null;
+  })
+  .filter((error) => error !== null);
+
+      
     const phasesEmpty = phases.every(
       (phase) => !phase.criteria.some((criterion) => criterion.value !== "")
     );
-    console.log("Chega aqui 1");
+    const enrollRangeEmpty = enrollmentRange.includes(null);
+    console.log("phases w errors", phasesWithErrors)
     if (
       categoriesEmpty ||
       educationLevelsEmpty ||
       evaluatorsEmpty ||
       phasesEmpty ||
+      enrollRangeEmpty ||
       phasesWithErrors.length > 0
     ) {
       if (categoriesEmpty) {
@@ -354,7 +397,7 @@ function CreateEventPage() {
       if (evaluatorsEmpty) {
         setError((prev) => ({
           ...prev,
-          general: "O evento deve possuir ao menos um avaliador",
+          evaluators: "O evento deve possuir ao menos um avaliador",
         }));
         console.log("erro");
       }
@@ -371,6 +414,12 @@ function CreateEventPage() {
           phases: phasesWithErrors.join(" "),
         }));
       }
+      if (enrollRangeEmpty) {
+        setError((prev) => ({
+          ...prev,
+          enroll: "O evento deve possuir um intervalo de inscrição",
+        }));
+      }
       return;
     }
 
@@ -383,9 +432,7 @@ function CreateEventPage() {
     }
     setIsSubmitting(true);
 
-    console.log("Chega aqui 2");
     try {
-      console.log("Phases before update", phases);
       let fileMetadata = null;
       let imgMetadata = null;
       if (isFileDirty(rulesFile, existingRulesFile)) {
@@ -405,12 +452,12 @@ function CreateEventPage() {
       } else {
         imgMetadata = existingImageFile;
       }
-      console.log("Chega aqui 3");
       if (eventId) {
         await dbService.updateEvent(
           eventId,
           title,
           description,
+          enrollmentRange,
           filteredCategories,
           filteredEducationLevels,
           phases,
@@ -422,6 +469,7 @@ function CreateEventPage() {
         await dbService.createEvent(
           title,
           description,
+          enrollmentRange,
           filteredCategories,
           filteredEducationLevels,
           phases,
@@ -430,7 +478,6 @@ function CreateEventPage() {
           filteredEvaluators
         );
       }
-      console.log("Navegando para /home...");
       navigate("/home");
     } catch (err) {
       setIsSubmitting(false);
@@ -517,8 +564,40 @@ function CreateEventPage() {
                     <p className="text-danger fs-6">{error.description}</p>
                   )}
                 </div>
+                <div className="col-12 col-md-6 mb-2 d-flex flex-column">
+                  <label className="label mb-1">Período de inscrição</label>
+                  <DatePicker
+                    locale="pt-BR"
+                    selected={startEnroll}
+                    onChange={(dates) => {
+                      setEnrollmentRange(dates);
+                    }}
+                    startDate={startEnroll}
+                    endDate={endEnroll}
+                    selectsRange
+                    disabled={isSubmitting}
+                    customInput={
+                      <div
+                        className="btn squareBtn p-1 w-100"
+                        disabled={isSubmitting}
+                        onClick={(event) => event.preventDefault()}
+                      >
+                        <i className="bi bi-calendar-range me-2 flex-shrink-0"></i>
+                        {startEnroll && endEnroll
+                          ? `${format(startEnroll, "dd/MM/yyyy")} - ${format(
+                              endEnroll,
+                              "dd/MM/yyyy"
+                            )}`
+                          : "Adicionar data"}
+                      </div>
+                    }
+                  />
+                </div>
 
                 <div className="col-12 align-items-start mb-4">
+                  {error.enroll && (
+                    <p className="text-danger fs-6">{error.enroll}</p>
+                  )}
                   <label className="label mb-2">Categorias</label>
                   {categories.map((item, i) => (
                     <div key={i} className="d-flex mb-2">
@@ -744,6 +823,8 @@ function CreateEventPage() {
                               typeof t === "string" ? { value: t } : t
                             ) || [{ value: "" }]
                           }
+                          submissionRange={phases[i].submissionRange}
+                          evaluationRange={phases[i].evaluationRange}
                           setSubmission={phases[i].setSubmission}
                           numberApproved={phases[i].numberApproved}
                           isSubmitting={isSubmitting}
@@ -756,9 +837,14 @@ function CreateEventPage() {
                           handlePhaseFileSubmissionChange={
                             handlePhaseFileSubmissionChange
                           }
-                          f
                           handlePhaseNumberApprovedBlur={
                             handlePhaseNumberApprovedBlur
+                          }
+                          handleSubmissionRangeChange={
+                            handleSubmissionRangeChange
+                          }
+                          handleEvaluationRangeChange={
+                            handleEvaluationRangeChange
                           }
                         />
                         <button

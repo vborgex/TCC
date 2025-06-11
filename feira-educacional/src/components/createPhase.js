@@ -1,10 +1,19 @@
 import "./createPhase.css";
 import { useEffect, useState } from "react";
+import DatePicker, { registerLocale } from "react-datepicker";
+import { format } from "date-fns";
+import "react-datepicker/dist/react-datepicker.css";
+import ptBR from "date-fns/locale/pt-BR";
+import { Timestamp } from "firebase/firestore";
+
+registerLocale("pt-BR", ptBR);
 
 function CreatePhase({
   id,
   criteria,
   textAreas,
+  submissionRange,
+  evaluationRange,
   setSubmission,
   numberApproved,
   isSubmitting,
@@ -16,7 +25,23 @@ function CreatePhase({
   removePhaseCriteria,
   handlePhaseFileSubmissionChange,
   handlePhaseNumberApprovedBlur,
+  handleSubmissionRangeChange,
+  handleEvaluationRangeChange,
 }) {
+  const normalizeRange = (range = [null, null]) =>
+    range.map((d) =>
+      d && typeof d === "object" && "toDate" in d ? d.toDate() : d
+    );
+
+  const [submissionDates, setSubmissionDates] = useState(
+    normalizeRange(submissionRange)
+  );
+  const [evaluationDates, setEvaluationDates] = useState(
+    normalizeRange(evaluationRange)
+  );
+
+  const [startSub, endSub] = submissionDates;
+  const [startEval, endEval] = evaluationDates;
   console.log(criteria);
   const [localNumberApproved, setLocalNumberApproved] = useState(
     numberApproved || ""
@@ -39,19 +64,66 @@ function CreatePhase({
         <label className="label fs-5">{`Fase ${id + 1}`}</label>
       </div>
 
-      <div className="col-12 col-md-6 mb-2">
-        <label className="label">Submissão</label>
-        <button className="btn squareBtn p-1 w-100" disabled = {isSubmitting}>
-          <i className="bi bi-calendar-range me-2 flex-shrink-0"></i>
-          Adicionar data
-        </button>
+      <div className="col-12 col-md-6 mb-2 d-flex flex-column">
+        <label className="label mb-1">Submissão</label>
+        <DatePicker
+          locale="pt-BR"
+          selected={startSub}
+          onChange={(dates) => {
+            setSubmissionDates(dates);
+            handleSubmissionRangeChange(id, dates);
+          }}
+          startDate={startSub}
+          endDate={endSub}
+          selectsRange
+          disabled={isSubmitting}
+          customInput={
+            <div
+              className="btn squareBtn p-1 w-100"
+              disabled={isSubmitting}
+              onClick={(event) => event.preventDefault()}
+            >
+              <i className="bi bi-calendar-range me-2 flex-shrink-0"></i>
+              {startSub && endSub
+                ? `${format(startSub, "dd/MM/yyyy")} - ${format(
+                    endSub,
+                    "dd/MM/yyyy"
+                  )}`
+                : "Adicionar data"}
+            </div>
+          }
+        />
       </div>
-      <div className="col-12 col-md-6 mb-2">
-        <label className="label">Avaliação</label>
-        <button className="btn squareBtn p-1 w-100" disabled = {isSubmitting}>
-          <i className="bi bi-calendar-range me-2 flex-shrink-0"></i>
-          Adicionar data
-        </button>
+
+      <div className="col-12 col-md-6 mb-2 d-flex flex-column">
+        <label className="label mb-1">Avaliação</label>
+        <DatePicker
+          locale="pt-BR"
+          selected={startEval}
+          onChange={(dates) => {
+            setEvaluationDates(dates);
+            handleEvaluationRangeChange(id, dates);
+          }}
+          startDate={startEval}
+          endDate={endEval}
+          selectsRange
+          disabled={isSubmitting}
+          customInput={
+            <div
+              className="btn squareBtn p-1 w-100"
+              disabled={isSubmitting}
+              onClick={(event) => event.preventDefault()}
+            >
+              <i className="bi bi-calendar-range me-2 flex-shrink-0"></i>
+              {startEval && endEval
+                ? `${format(startEval, "dd/MM/yyyy")} - ${format(
+                    endEval,
+                    "dd/MM/yyyy"
+                  )}`
+                : "Adicionar data"}
+            </div>
+          }
+        />
       </div>
 
       <div className="col-6 mb-2">
@@ -62,7 +134,7 @@ function CreatePhase({
             id="fileSubmit"
             onChange={() => handlePhaseFileSubmissionChange(id)}
             checked={setSubmission}
-            disabled = {isSubmitting}
+            disabled={isSubmitting}
           />
           <label className="form-check-label" htmlFor="fileSubmit">
             Submissão de arquivo
@@ -82,14 +154,13 @@ function CreatePhase({
                 value={textAreas[i].value}
                 onChange={(e) => updatePhaseTextAreas(id, i, e.target.value)}
                 maxLength="80"
-                disabled = {isSubmitting}
+                disabled={isSubmitting}
               />
               <button
                 className="btn-remove"
                 onClick={() => removePhaseTextAreas(id, i)}
                 disabled={textAreas.length <= 1 || isSubmitting}
                 type="button"
-                
               >
                 Remover
               </button>
@@ -121,14 +192,13 @@ function CreatePhase({
                 value={criteria[i].value}
                 onChange={(e) => updatePhaseCriteria(id, i, e.target.value)}
                 maxLength="80"
-                disabled = {isSubmitting}
+                disabled={isSubmitting}
               />
               <button
                 className="btn-remove"
                 onClick={() => removePhaseCriteria(id, i)}
                 disabled={criteria.length <= 1 || isSubmitting}
                 type="button"
-                
               >
                 Remover
               </button>
@@ -160,7 +230,7 @@ function CreatePhase({
             min="0"
             onChange={handleChange}
             onBlur={handleBlur}
-            disabled = {isSubmitting}
+            disabled={isSubmitting}
           />
         </div>
       </div>

@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { dbService } from "../../service/dbService";
 import React, { useEffect, useState } from "react";
 import Loading from "../../components/loading";
-
+import moment from "moment"; 
 function ManageEvaluatorsPage() {
   const { eventId } = useParams();
   const [evaluatorsPerProject, setEvaluatorsPerProject] = useState(2);
@@ -14,15 +14,16 @@ function ManageEvaluatorsPage() {
   const [loading, setLoading] = useState(true);
   const [evaluators, setEvaluators] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [selectedPhase, setSelectedPhase] = useState("");
+  const [currentDate] = useState(moment());
 
   useEffect(() => {
-    console.log("eventid", eventId);
     async function fetchData() {
       try {
         const resultado = await dbService.getEventData(eventId);
         if (resultado) {
-          console.log(resultado);
           setEvent(resultado);
+          setSelectedPhase(resultado.phases?.[0]?.name || "");
           const fetchedProjects = await dbService.getEventProjects(eventId);
           const evaluatorsIds = resultado.evaluators;
           const evaluatorData = await Promise.all(
@@ -40,7 +41,6 @@ function ManageEvaluatorsPage() {
         setLoading(false);
       }
     }
-
     fetchData();
   }, [eventId]);
 
@@ -56,12 +56,11 @@ function ManageEvaluatorsPage() {
   const handleDistribute = () => {
     const totalEvaluators = evaluators.length;
     if (evaluatorsPerProject > totalEvaluators) {
-      alert(
-        "Número de avaliadores por projeto maior que o total de avaliadores."
-      );
+      alert("Número de avaliadores por projeto maior que o total de avaliadores.");
       return;
     }
 
+    const phaseAssignments = assignments[selectedPhase] || {};
     const baseShuffled = shuffleArray(evaluators);
     const newAssignments = {};
 
@@ -77,20 +76,32 @@ function ManageEvaluatorsPage() {
       newAssignments[project.id] = evaluatorsForProject;
     });
 
-    setAssignments(newAssignments);
+    setAssignments((prev) => ({
+      ...prev,
+      [selectedPhase]: newAssignments
+    }));
+  };
+
+  const getAssignmentsForPhase = (phaseName) => {
+    return assignments[phaseName] || {};
   };
 
   const assignmentsByEvaluator = {};
-  Object.entries(assignments).forEach(([projectId, evalNames]) => {
+  const currentAssignments = getAssignmentsForPhase(selectedPhase);
+  Object.entries(currentAssignments).forEach(([projectId, evalNames]) => {
     evalNames.forEach((evalName) => {
       if (!assignmentsByEvaluator[evalName]) {
         assignmentsByEvaluator[evalName] = [];
       }
-      const projectTitle =
-        projects.find((p) => p.id === projectId)?.title || projectId;
+      const projectTitle = projects.find((p) => p.id === projectId)?.title || projectId;
       assignmentsByEvaluator[evalName].push(projectTitle);
     });
   });
+
+  const isEditingAllowed = () => {
+    const phase = event.phases?.find((p) => p.name === selectedPhase);
+    return phase && currentDate.isBetween(moment(phase.submissionStart), moment(phase.submissionEnd), null, "[]");
+  };
 
   if (loading) {
     return (
@@ -106,32 +117,39 @@ function ManageEvaluatorsPage() {
       <Navbar />
       <div className="d-flex p-2 justify-content-center">
         <div className="card-create-project p-10 w-100 max-w-900 mt-4 mb-5">
-          <div className="text-center text-uppercase">
-            <h2 id="eventName">Gerenciar Avaliadores</h2>
+          <h2 className="text-center text-uppercase">Gerenciar Avaliadores</h2>
+
+          <div className="mb-3">
+            <label>Fase</label>
+            <select className="" value={selectedPhase} onChange={(e) => setSelectedPhase(e.target.value)}>
+              {event.phases?.map((p) => (
+                <option key={p.name} value={p.name}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
           </div>
+
           <div className="w-100 d-flex flex-column flex-sm-row gap-2 mb-2">
             <input
               type="text"
               className="form-control"
               placeholder={`Avaliadores por projeto`}
               onChange={(e) => setEvaluatorsPerProject(Number(e.target.value))}
-              maxLength="80"
+              disabled={!isEditingAllowed()}
             />
-            <button
-              onClick={handleDistribute}
-              className="squareBtn"
-              type="button"
-            >
+            <button onClick={handleDistribute} className="squareBtn" type="button" disabled={!isEditingAllowed()}>
               Distribuir
             </button>
           </div>
 
-          <Tabs
-            id="manage-evaluators-tabs"
-            activeKey={key}
-            onSelect={(k) => setKey(k)}
-            className="mb-3"
-          >
+          {!isEditingAllowed() && (
+            <div className="alert alert-warning text-center">
+              Fora do período de submissão da fase. Edição desativada.
+            </div>
+          )}
+
+          <Tabs id="manage-evaluators-tabs" activeKey={key} onSelect={(k) => setKey(k)} className="mb-3">
             <Tab eventKey="byProject" title="Por Projeto">
               <Table striped bordered hover responsive="md" className="w-100">
                 <thead>
@@ -145,8 +163,8 @@ function ManageEvaluatorsPage() {
                     <tr key={project.id}>
                       <td>{project.title}</td>
                       <td>
-                        {assignments[project.id]?.length
-                          ? assignments[project.id].join(", ")
+                        {currentAssignments[project.id]?.length
+                          ? currentAssignments[project.id].join(", ")
                           : "Nenhum"}
                       </td>
                     </tr>
@@ -176,13 +194,8 @@ function ManageEvaluatorsPage() {
           </Tabs>
 
           <div className="d-flex gap-2 mt-5 mb-3">
-            <button className="btn btn-cancelar rounded-pill flex-fill">
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="btn btn-confirmar rounded-pill flex-fill"
-            >
+            <button className="btn btn-cancelar rounded-pill flex-fill">Cancelar</button>
+            <button type="submit" className="btn btn-confirmar rounded-pill flex-fill">
               Confirmar
             </button>
           </div>
