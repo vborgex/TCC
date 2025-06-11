@@ -26,6 +26,7 @@ function CreateEventPage() {
   const [categories, setCategories] = useState([{ value: "" }]);
   const [educationLevels, setEducationLevels] = useState([{ value: "" }]);
   const [event, setEvent] = useState(null);
+  const [evaluators, setEvaluators] = useState([{ value: "" }]);
   const [phases, setPhases] = useState([
     {
       textAreas: [{ value: "" }],
@@ -34,7 +35,8 @@ function CreateEventPage() {
       numberApproved: "",
     },
   ]);
-  console.log("Phases:", phases)
+
+  console.log("CreateEventPage re-renderizou!");
   const [error, setError] = useState({
     title: "",
     description: "",
@@ -78,6 +80,13 @@ function CreateEventPage() {
               value: educationLevel,
             }))
           );
+          const evaluatorEmails = await Promise.all(
+            resultado.evaluators.map(async (evaluatorId) => {
+              const userDoc = await dbService.getUserDataById(evaluatorId);
+                return { value: userDoc?.email || "" };
+              })
+            );
+          setEvaluators(evaluatorEmails);
         }
       } catch (error) {
         console.error("Erro ao buscar evento:", error);
@@ -116,11 +125,13 @@ function CreateEventPage() {
     });
     setPhases(temp);
   };
-const isFileDirty = (newFile, existingFile) => {
-  if (!newFile && !existingFile) return false;
-  if (!newFile || !existingFile) return true;
-  return newFile.name !== existingFile.name || newFile.size !== existingFile.size;
-};
+  const isFileDirty = (newFile, existingFile) => {
+    if (!newFile && !existingFile) return false;
+    if (!newFile || !existingFile) return true;
+    return (
+      newFile.name !== existingFile.name || newFile.size !== existingFile.size
+    );
+  };
   const addPhaseTextAreas = (phaseIndex) => {
     const temp = phases.map((phase, index) => {
       if (index === phaseIndex) {
@@ -251,7 +262,7 @@ const isFileDirty = (newFile, existingFile) => {
   };
 
   const handleImageFileChange = (file) => {
-    if (file && (file.type === "image/jpeg")) {
+    if (file && file.type === "image/jpeg") {
       setImageFile(file);
       setError((prev) => ({ ...prev, imageFile: "" }));
     } else {
@@ -272,6 +283,7 @@ const isFileDirty = (newFile, existingFile) => {
       imageFile: "",
       categories: "",
       educationLevels: "",
+      evaluators: "",
       phases: "",
       general: "",
     });
@@ -282,9 +294,13 @@ const isFileDirty = (newFile, existingFile) => {
     const filteredEducationLevels = educationLevels.filter(
       (level) => level.value !== ""
     );
+    const filteredEvaluators = evaluators.filter(
+      (evaluator) => evaluator.value !== ""
+    );
 
     const categoriesEmpty = filteredCategories.length === 0;
     const educationLevelsEmpty = filteredEducationLevels.length === 0;
+    const evaluatorsEmpty = filteredEvaluators.length === 0;
 
     const phasesWithErrors = phases
       .map((phase, index) => {
@@ -314,10 +330,11 @@ const isFileDirty = (newFile, existingFile) => {
     const phasesEmpty = phases.every(
       (phase) => !phase.criteria.some((criterion) => criterion.value !== "")
     );
-
+    console.log("Chega aqui 1");
     if (
       categoriesEmpty ||
       educationLevelsEmpty ||
+      evaluatorsEmpty ||
       phasesEmpty ||
       phasesWithErrors.length > 0
     ) {
@@ -333,6 +350,13 @@ const isFileDirty = (newFile, existingFile) => {
           educationLevels:
             "O evento deve possuir ao menos um nível de escolaridade",
         }));
+      }
+      if (evaluatorsEmpty) {
+        setError((prev) => ({
+          ...prev,
+          general: "O evento deve possuir ao menos um avaliador",
+        }));
+        console.log("erro");
       }
       if (phasesEmpty) {
         setError((prev) => ({
@@ -358,6 +382,8 @@ const isFileDirty = (newFile, existingFile) => {
       return;
     }
     setIsSubmitting(true);
+
+    console.log("Chega aqui 2");
     try {
       console.log("Phases before update", phases);
       let fileMetadata = null;
@@ -367,8 +393,8 @@ const isFileDirty = (newFile, existingFile) => {
           await storageService.deleteFile(event.fileMetadata.path);
         }
         fileMetadata = await storageService.uploadFile(rulesFile, "events");
-      }else{
-        fileMetadata = existingRulesFile
+      } else {
+        fileMetadata = existingRulesFile;
       }
 
       if (isFileDirty(imageFile, existingImageFile)) {
@@ -376,10 +402,10 @@ const isFileDirty = (newFile, existingFile) => {
           await storageService.deleteFile(event.imgMetadata.path);
         }
         imgMetadata = await storageService.uploadFile(imageFile, "banners");
-      }else{
-        imgMetadata = existingImageFile
+      } else {
+        imgMetadata = existingImageFile;
       }
-
+      console.log("Chega aqui 3");
       if (eventId) {
         await dbService.updateEvent(
           eventId,
@@ -389,7 +415,8 @@ const isFileDirty = (newFile, existingFile) => {
           filteredEducationLevels,
           phases,
           fileMetadata,
-          imgMetadata
+          imgMetadata,
+          filteredEvaluators
         );
       } else {
         await dbService.createEvent(
@@ -399,14 +426,19 @@ const isFileDirty = (newFile, existingFile) => {
           filteredEducationLevels,
           phases,
           fileMetadata,
-          imgMetadata
+          imgMetadata,
+          filteredEvaluators
         );
       }
+      console.log("Navegando para /home...");
       navigate("/home");
     } catch (err) {
       setIsSubmitting(false);
       console.log(err);
-      setError((prev) => ({ ...prev, general: "Erro ao cadastrar o evento" }));
+      setError((prev) => ({
+        ...prev,
+        general: "Erro ao cadastrar o evento: " + err.message,
+      }));
     }
   };
 
@@ -447,9 +479,10 @@ const isFileDirty = (newFile, existingFile) => {
           <div className="card-create-project p-3 w-100 max-w-900 mt-4 mb-4">
             <div className="text-center text-uppercase">
               {isEditing ? (
-              <h2 id="eventName">Editar Evento</h2>
-              ): (
-              <h2 id="eventName">Criar Evento</h2>)}
+                <h2 id="eventName">Editar Evento</h2>
+              ) : (
+                <h2 id="eventName">Criar Evento</h2>
+              )}
             </div>
             <form onSubmit={onSubmit}>
               <div className="row justify-content-start align-items-end">
@@ -461,7 +494,7 @@ const isFileDirty = (newFile, existingFile) => {
                     onChange={(e) => setTitle(e.target.value)}
                     maxLength="100"
                     value={title}
-                    disabled = {isSubmitting}
+                    disabled={isSubmitting}
                   />
                   {error.title && (
                     <p className="text-danger fs-6">{error.title}</p>
@@ -478,7 +511,7 @@ const isFileDirty = (newFile, existingFile) => {
                     rows="4"
                     maxLength="600"
                     onChange={(e) => setDescription(e.target.value)}
-                    disabled = {isSubmitting}
+                    disabled={isSubmitting}
                   ></textarea>
                   {error.description && (
                     <p className="text-danger fs-6">{error.description}</p>
@@ -504,7 +537,7 @@ const isFileDirty = (newFile, existingFile) => {
                             )
                           }
                           maxLength="80"
-                          disabled = {isSubmitting}
+                          disabled={isSubmitting}
                         />
                         <button
                           className="btn-remove"
@@ -525,7 +558,7 @@ const isFileDirty = (newFile, existingFile) => {
                       e.preventDefault();
                       addInput(categories, setCategories);
                     }}
-                    disabled={categories.length >= 10 ||isSubmitting}
+                    disabled={categories.length >= 10 || isSubmitting}
                   >
                     <i className="bi bi-plus me-2 flex-shrink-0"></i>
                     Adicionar categoria
@@ -554,7 +587,7 @@ const isFileDirty = (newFile, existingFile) => {
                             )
                           }
                           maxLength="80"
-                          disabled = {isSubmitting}
+                          disabled={isSubmitting}
                         />
                         <button
                           className="btn-remove"
@@ -575,7 +608,7 @@ const isFileDirty = (newFile, existingFile) => {
                       e.preventDefault();
                       addInput(educationLevels, setEducationLevels);
                     }}
-                    disabled={educationLevels.length >= 5 ||isSubmitting}
+                    disabled={educationLevels.length >= 5 || isSubmitting}
                   >
                     <i className="bi bi-plus me-2 flex-shrink-0"></i>
                     Adicionar nível
@@ -585,13 +618,66 @@ const isFileDirty = (newFile, existingFile) => {
                   )}
                 </div>
 
-                <div className="col-12 d-flex flex-column align-items-start" disabled = {isSubmitting}>
+                <div className="col-12 align-items-start mb-4">
+                  <label className="label mb-2">Avaliadores</label>
+                  {evaluators.map((item, i) => (
+                    <div key={i} className="d-flex mb-2">
+                      <div className="w-100 d-flex flex-column flex-sm-row gap-2">
+                        <input
+                          type="email"
+                          className="form-control"
+                          placeholder={`E-mail ${i + 1}`}
+                          value={evaluators[i].value}
+                          onChange={(e) =>
+                            handleListChange(
+                              evaluators,
+                              setEvaluators,
+                              i,
+                              e.target.value
+                            )
+                          }
+                          maxLength="80"
+                          disabled={isSubmitting}
+                        />
+                        <button
+                          className="btn-remove"
+                          onClick={() =>
+                            removeInput(evaluators, setEvaluators, i)
+                          }
+                          disabled={evaluators.length <= 1 || isSubmitting}
+                          type="button"
+                        >
+                          Remover
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    className="squareBtn p-1 w-100 fs-6"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      addInput(evaluators, setEvaluators);
+                    }}
+                    disabled={evaluators.length >= 10 || isSubmitting}
+                  >
+                    <i className="bi bi-plus me-2 flex-shrink-0"></i>
+                    Adicionar avaliador
+                  </button>
+                  {error.evaluators && (
+                    <p className="text-danger fs-6">{error.evaluators}</p>
+                  )}
+                </div>
+
+                <div
+                  className="col-12 d-flex flex-column align-items-start"
+                  disabled={isSubmitting}
+                >
                   <label className="label mb-2">Banner do evento</label>
                   <label
                     className="btn btn-custom btn-regulamento mb-2 d-flex align-items-center text-truncate w-100"
                     htmlFor="fileInputImg"
                     style={{ cursor: "pointer" }}
-                    disabled = {isSubmitting}
+                    disabled={isSubmitting}
                   >
                     <i className="bi bi-file-earmark-arrow-up me-2 flex-shrink-0"></i>
                     <span className="text-truncate">
@@ -607,7 +693,7 @@ const isFileDirty = (newFile, existingFile) => {
                     accept=" image/*"
                     style={{ display: "none" }}
                     onChange={(e) => handleImageFileChange(e.target.files[0])}
-                    disabled = {isSubmitting}
+                    disabled={isSubmitting}
                   />
                   {error.file && (
                     <p className="text-danger fs-6">{error.imageFile}</p>
@@ -619,7 +705,7 @@ const isFileDirty = (newFile, existingFile) => {
                     className="btn btn-custom btn-regulamento mb-2 d-flex align-items-center text-truncate w-100"
                     htmlFor="fileInputPdf"
                     style={{ cursor: "pointer" }}
-                    disabled = {isSubmitting}
+                    disabled={isSubmitting}
                   >
                     <i className="bi bi-file-earmark-arrow-up me-2 flex-shrink-0"></i>
                     <span className="text-truncate">
@@ -635,7 +721,7 @@ const isFileDirty = (newFile, existingFile) => {
                     accept="application/pdf"
                     style={{ display: "none" }}
                     onChange={(e) => handleRulesFileChange(e.target.files[0])}
-                    disabled = {isSubmitting}
+                    disabled={isSubmitting}
                   />
                   {error.file && (
                     <p className="text-danger fs-6">{error.rulesFile}</p>
@@ -660,7 +746,7 @@ const isFileDirty = (newFile, existingFile) => {
                           }
                           setSubmission={phases[i].setSubmission}
                           numberApproved={phases[i].numberApproved}
-                          isSubmitting = {isSubmitting}
+                          isSubmitting={isSubmitting}
                           addPhaseTextAreas={addPhaseTextAreas}
                           updatePhaseTextAreas={updatePhaseTextAreas}
                           removePhaseTextAreas={removePhaseTextAreas}
@@ -681,7 +767,7 @@ const isFileDirty = (newFile, existingFile) => {
                             e.preventDefault();
                             removeInput(phases, setPhases, i);
                           }}
-                          disabled={phases.length <= 1 ||isSubmitting}
+                          disabled={phases.length <= 1 || isSubmitting}
                         >
                           <i className="bi bi-x me-2 flex-shrink-0"></i>
                           {`REMOVER FASE ${i + 1}`}
@@ -694,7 +780,7 @@ const isFileDirty = (newFile, existingFile) => {
                         e.preventDefault();
                         addPhase();
                       }}
-                      disabled={phases.length >= 5 ||isSubmitting}
+                      disabled={phases.length >= 5 || isSubmitting}
                     >
                       <i className="bi bi-plus me-2 flex-shrink-0"></i>
                       ADICIONAR FASE
@@ -705,13 +791,16 @@ const isFileDirty = (newFile, existingFile) => {
                   )}
 
                   <div className="d-flex gap-2 mt-5 mb-3">
-                    <button className="btn btn-cancelar rounded-pill flex-fill" disabled = {isSubmitting}>
+                    <button
+                      className="btn btn-cancelar rounded-pill flex-fill"
+                      disabled={isSubmitting}
+                    >
                       Cancelar
                     </button>
                     <button
                       type="submit"
                       className="btn btn-confirmar rounded-pill flex-fill"
-                      disabled = {isSubmitting}
+                      disabled={isSubmitting}
                     >
                       Confirmar
                     </button>

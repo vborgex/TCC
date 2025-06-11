@@ -100,6 +100,20 @@ export const dbService = {
       throw error;
     }
   },
+  async getEventProjects(eventId){
+    try {
+      const projectRef = collection(db, "projects");
+      const q = query(projectRef, where("eventId", "==", eventId));
+      const querySnapshot = await getDocs(q);
+      const projects = [];
+      querySnapshot.forEach((doc) => {
+        projects.push({ id: doc.id, ...doc.data() });
+        });
+        return projects;
+    } catch (error) {
+      throw error;
+    }
+  },
   async getUserProjects() {
     try {
       const user = auth.currentUser;
@@ -117,13 +131,58 @@ export const dbService = {
       return projects;
     } catch (error) {
       throw error;
+      console.log(error);
     }
   },
+  async validateEvaluatorEmails(evaluatorEmails) {
+    const cleanedEmails = evaluatorEmails
+      .map((email) => email.trim())
+      .filter((email) => email !== "");
 
-  async createEvent(title, description, categories, educationLevels, phases, fileMetadata, imgMetadata) {
+    if (cleanedEmails.length === 0) return [];
+
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("email", "in", cleanedEmails));
+    const querySnapshot = await getDocs(q);
+
+    const validEvaluators = querySnapshot.docs.filter((doc) => {
+      const data = doc.data();
+      return data.role === "AVALIADOR";
+    });
+
+    const validEmails = validEvaluators.map((doc) => doc.data().email);
+    const invalidEmails = cleanedEmails.filter(
+      (email) => !validEmails.includes(email)
+    );
+
+    if (invalidEmails.length > 0) {
+      throw new Error(
+        `Os seguintes emails não possuem a role de AVALIADOR ou não existem: ${invalidEmails.join(
+          ", "
+        )}`
+      );
+    }
+
+    return validEvaluators.map((doc) => doc.id);
+  },
+  async createEvent(
+    title,
+    description,
+    categories,
+    educationLevels,
+    phases,
+    fileMetadata,
+    imgMetadata,
+    evaluators
+  ) {
     try {
       const user = auth.currentUser;
       if (!user) throw new Error("Usuário não autenticado.");
+
+      const evaluatorEmails = evaluators
+        .map((ev) => ev.value.trim())
+        .filter((email) => email !== "");
+      const evaluatorIds = await this.validateEvaluatorEmails(evaluatorEmails);
 
       const categoriesToSave = categories
         .map((cat) => cat.value.trim())
@@ -151,7 +210,8 @@ export const dbService = {
         creatorId: user.uid,
         createdAt: new Date(),
         fileMetadata,
-        imgMetadata
+        imgMetadata,
+        evaluators: evaluatorIds,
       };
 
       await addDoc(collection(db, "events"), newEvent);
@@ -166,12 +226,14 @@ export const dbService = {
     categories,
     educationLevels,
     phases,
-    fileMetadata, 
-    imgMetadata
+    fileMetadata,
+    imgMetadata,
+    evaluators
   ) {
     try {
       const user = auth.currentUser;
       if (!user) throw new Error("Usuário não autenticado.");
+
       const eventRef = doc(db, "events", id);
       const eventSnap = await getDoc(eventRef);
       if (!eventSnap.exists()) {
@@ -180,6 +242,12 @@ export const dbService = {
       if (eventSnap.data().creatorId !== user.uid) {
         throw new Error("Você não tem permissão para editar esse evento.");
       }
+
+      const evaluatorEmails = evaluators
+        .map((ev) => ev.value.trim())
+        .filter((email) => email !== "");
+      const evaluatorIds = await this.validateEvaluatorEmails(evaluatorEmails);
+
       const categoriesToSave = categories
         .map((cat) => cat.value.trim())
         .filter((val) => val !== "");
@@ -192,15 +260,17 @@ export const dbService = {
         description,
         categories: categoriesToSave,
         educationLevels: educationLevelsToSave,
-        phases: phases,
+        phases,
         updatedAt: new Date(),
         fileMetadata,
-        imgMetadata
+        imgMetadata,
+        evaluators: evaluatorIds,
       });
     } catch (error) {
       throw error;
     }
   },
+
   async getEventData(eventId) {
     try {
       const eventDoc = await getDoc(doc(db, "events", eventId));
@@ -283,6 +353,15 @@ export const dbService = {
       const userDoc = await getDoc(doc(db, "users", user.uid));
       if (!userDoc.exists()) return null;
 
+      return userDoc.data();
+    } catch (error) {
+      throw error;
+    }
+  },
+  async getUserDataById(userId) {
+    try {
+      const userDoc = await getDoc(doc(db, "users", userId));
+      if (!userDoc.exists()) return null;
       return userDoc.data();
     } catch (error) {
       throw error;

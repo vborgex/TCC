@@ -15,6 +15,7 @@ import EventListPage from "./pages/EventListPage";
 import EventDetailsPage from "./pages/EventDetailsPage";
 import PublicEventListPage from "./pages/PublicEventList";
 import EvaluationDetailsPage from "./pages/EvaluationDetailsPage";
+import ManageEvaluatorsPage from "./pages/ManageEvaluators";
 
 function RoutesApp() {
   return (
@@ -31,6 +32,7 @@ function RoutesApp() {
           path="/evaluationDetails/:id"
           element={<EvaluationDetailsPage />}
         />
+        <Route path="/manageevaluators/:eventId" element={<ManageEvaluatorsPage/>}/>
 
         <Route element={<PublicOnlyRoute />}>
           <Route path="/start" element={<StartPage />} />
