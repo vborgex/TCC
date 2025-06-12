@@ -9,6 +9,7 @@ import astronaut from "./../../assets/Astronaut3.svg";
 import { AuthService } from "../../service/authService";
 import CreateProjectPhase from "../../components/createProjectPhase";
 import Loading from "./../../components/loading";
+import { storageService } from "../../service/storageService";
 
 function CreateProjectPage() {
   const { eventId, projectId } = useParams();
@@ -24,6 +25,8 @@ function CreateProjectPage() {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [user, setUser] = useState();
+  const [existingPhaseReplies, setExistingPhaseReplies] = useState([]);
   const [phasesReplies, setPhasesReplies] = useState([]);
   const [error, setError] = useState({
     title: "",
@@ -35,11 +38,49 @@ function CreateProjectPage() {
     general: "",
   });
 
+  const handlePhaseFileChange = (file, phaseIndex) => {
+    if (file && file.type === "application/pdf") {
+      const newReplies = [...phasesReplies];
+      newReplies[phaseIndex].file = file;
+      setPhasesReplies(newReplies);
+      setError((prev) => ({ ...prev, file: "" }));
+    } else {
+      setError((prev) => ({
+        ...prev,
+        file: "Por favor selecione um arquivo tipo pdf",
+      }));
+    }
+  };
+
+  const handleFileChange = (file, index) => {
+    if (file && file.type === "application/pdf") {
+      const newReplies = [...phasesReplies];
+      newReplies[index].file = file;
+      setPhasesReplies(newReplies);
+      setError((prev) => ({ ...prev, file: "" }));
+    } else {
+      setError((prev) => ({
+        ...prev,
+        file: "Por favor selecione um arquivo tipo pdf",
+      }));
+    }
+  };
+
+  const isFileDirty = (newFile, existingFile) => {
+    if (!newFile && !existingFile) return false;
+    if (!newFile || !existingFile) return true;
+    return (
+      newFile.name !== existingFile.name || newFile.size !== existingFile.size
+    );
+  };
+
   useEffect(() => {
     console.log("eventId:", eventId);
     async function fetchEvent() {
       const user = await AuthService.getCurrentUser();
+      setUser(user);
       try {
+        console.log("user.uid", user.uid);
         const resultado = await dbService.getEventData(eventId);
         if (resultado) {
           setEvent(resultado);
@@ -64,7 +105,7 @@ function CreateProjectPage() {
             }
 
             setIsEditing(true);
-
+            console.log("creatorid", projeto.creatorId);
             setTitle(projeto.title);
             setDescription(projeto.description);
             setSelectedCategory(projeto.category);
@@ -81,7 +122,18 @@ function CreateProjectPage() {
               file: fasesSalvas[index]?.file || null,
             }));
 
-            setPhasesReplies(newPhases);
+            const existingPhaseRepliesCopy = newPhases.map((phase) => ({
+              textAreas: { ...phase.textAreas },
+              file: phase.file,
+            }));
+
+            const phasesRepliesCopy = newPhases.map((phase) => ({
+              textAreas: { ...phase.textAreas },
+              file: phase.file,
+            }));
+
+            setExistingPhaseReplies(existingPhaseRepliesCopy);
+            setPhasesReplies(phasesRepliesCopy);
           }
         } else {
           setFail(true);
@@ -111,20 +163,6 @@ function CreateProjectPage() {
     setPhasesReplies(newReplies);
   };
 
-  const handleFileChange = (file, index) => {
-    if (file && file.type === "application/pdf") {
-      const newReplies = [...phasesReplies];
-      newReplies[index].file = file;
-      setPhasesReplies(newReplies);
-      setError((prev) => ({ ...prev, file: "" }));
-    } else {
-      setError((prev) => ({
-        ...prev,
-        file: "Por favor selecione um arquivo tipo pdf",
-      }));
-    }
-  };
-
   const onSubmit = async (e) => {
     e.preventDefault();
     setError({
@@ -143,10 +181,6 @@ function CreateProjectPage() {
         Object.values(response.textAreas).some((text) => text.trim() === "")
     );
 
-    // const hasMissingFile = event.phases.some(
-    //   (phase, i) => phase.setSubmission && !phasesReplies[i].file
-    // );
-
     if (
       !title ||
       !description ||
@@ -160,7 +194,40 @@ function CreateProjectPage() {
       }));
       return;
     }
+
     try {
+      const updatedPhases = await Promise.all(
+        event.phases.map(async (phase, index) => {
+          const newPhase = {
+            textAreas: phasesReplies[index]?.textAreas || {},
+            file: null,
+          };
+
+          const newFile = phasesReplies[index]?.file;
+          console.log(newFile);
+          const oldFile = isEditing ? existingPhaseReplies[index]?.file : null;
+          console.log(oldFile);
+          console.log(isFileDirty(newFile, oldFile));
+          if (isFileDirty(newFile, oldFile)) {
+            if (isEditing && oldFile?.path) {
+              await storageService.deleteFile(oldFile.path);
+            }
+            if (newFile) {
+              const uploadedFile = await storageService.uploadFile(
+                newFile,
+                "projects",
+                user.uid
+              );
+              newPhase.file = uploadedFile;
+            }
+          } else {
+            newPhase.file = oldFile ?? null;
+          }
+
+          return newPhase;
+        })
+      );
+
       if (projectId) {
         await dbService.updateProject(
           projectId,
@@ -168,7 +235,7 @@ function CreateProjectPage() {
           description,
           selectedEducationLevel,
           selectedCategory,
-          phasesReplies
+          updatedPhases
         );
       } else {
         await dbService.createProject(
@@ -177,14 +244,17 @@ function CreateProjectPage() {
           selectedEducationLevel,
           selectedCategory,
           eventId,
-          phasesReplies
+          updatedPhases
         );
       }
 
       navigate("/myprojects");
     } catch (err) {
-      console.log(err);
-      setError((prev) => ({ ...prev, general: "Erro ao cadastrar o projeto" }));
+      console.error(err);
+      setError((prev) => ({
+        ...prev,
+        general: "Erro ao cadastrar o projeto",
+      }));
     }
   };
 
@@ -244,10 +314,15 @@ function CreateProjectPage() {
                 </div>
 
                 <div className="col-lg-6 col-12 d-flex flex-column align-items-start">
-                  <button className="btn btn-custom btn-regulamento mb-2">
+                  <a
+                    href={event.fileMetadata.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn-custom btn-regulamento mb-2"
+                  >
                     <i className="bi bi-book-half me-2"></i>
-                    Baixar Regulamento
-                  </button>
+                    Visualizar Regulamento
+                  </a>
                 </div>
                 <div className="col-12 d-flex flex-column align-items-start">
                   <label className="label mb-2">Resumo do projeto</label>
@@ -371,14 +446,14 @@ function CreateProjectPage() {
                       <div className="col-12 d-flex flex-column align-items-start">
                         <label
                           className="btn btn-custom btn-regulamento mb-2 d-flex align-items-center text-truncate w-100"
-                          htmlFor="fileInput"
+                          htmlFor={`fileInput-${index}`}
                           style={{ cursor: "pointer" }}
                         >
                           <i className="bi bi-file-earmark-arrow-up me-2 flex-shrink-0"></i>
                           <span className="text-truncate">
                             {phasesReplies[index]?.file
                               ? "Arquivo selecionado: " +
-                                phasesReplies[index].file.name
+                                `${phasesReplies[index].file.name}`
                               : "Adicionar Anexo"}
                           </span>
                         </label>
@@ -388,7 +463,7 @@ function CreateProjectPage() {
                           accept="application/pdf"
                           style={{ display: "none" }}
                           onChange={(e) =>
-                            handleFileChange(e.target.files[0], index)
+                            handlePhaseFileChange(e.target.files[0], index)
                           }
                         />
 
@@ -401,29 +476,6 @@ function CreateProjectPage() {
                     )}
                   </>
                 ))}
-                {/*             
-                  <div className="col-12 d-flex flex-column align-items-start">
-                    <label
-                      className="btn btn-custom btn-regulamento mb-2 d-flex align-items-center text-truncate w-100"
-                      htmlFor="fileInput"
-                      style={{ cursor: "pointer" }}
-                    >
-                      <i className="bi bi-file-earmark-arrow-up me-2 flex-shrink-0"></i>
-                      <span className="text-truncate">
-                        {selectedFile
-                          ? "Arquivo selecionado: " + selectedFile.name
-                          : "Adicionar Anexo"}
-                      </span>
-                    </label>
-                    <input
-                      type="file"
-                      id="fileInput"
-                      accept="application/pdf"
-                      style={{ display: "none" }}
-                      onChange={(e) => handleFileChange(e.target.files[0])}
-                    />
-                    {error.file && <p className="text-danger">{error.file}</p>}
-                  </div> */}
 
                 <div className="d-flex gap-2 mt-3 mb-3">
                   <button className="btn btn-cancelar rounded-pill flex-fill">

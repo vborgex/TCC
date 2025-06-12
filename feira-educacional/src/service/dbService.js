@@ -63,7 +63,7 @@ export const dbService = {
       if (!projectSnap.exists()) {
         throw new Error("Projeto não encontrado.");
       }
-      if (projectSnap.data().ownerId !== user.uid) {
+      if (projectSnap.data().creatorId !== user.uid) {
         throw new Error("Você não tem permissão para editar esse projeto.");
       }
       await updateDoc(projectRef, {
@@ -191,16 +191,7 @@ export const dbService = {
       const educationLevelsToSave = educationLevels
         .map((level) => level.value.trim())
         .filter((val) => val !== "");
-      const phasesToSave = phases.map((phase) => ({
-        criteria: phase.criteria
-          .map((c) => (c && c.value ? c.value.trim() : null))
-          .filter((val) => val !== null && val !== ""),
-        textAreas: phase.textAreas
-          .map((t) => (t && t.value ? t.value.trim() : null))
-          .filter((val) => val !== null && val !== ""),
-        setSubmission: phase.setSubmission,
-        numberApproved: phase.numberApproved,
-      }));
+
 
       const newEvent = {
         title,
@@ -208,7 +199,7 @@ export const dbService = {
         categories: categoriesToSave,
         enrollmentRange,
         educationLevels: educationLevelsToSave,
-        phases: phasesToSave,
+        phases: phases,
         creatorId: user.uid,
         createdAt: new Date(),
         fileMetadata,

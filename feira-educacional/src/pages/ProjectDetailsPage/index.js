@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { dbService } from "../../service/dbService";
 import { Link, useParams } from "react-router-dom";
 import astronaut from "./../../assets/Astronaut3.svg";
+import Loading from "../../components/loading";
 
 function ProjectDetailsPage() {
   const { id } = useParams();
@@ -34,6 +35,15 @@ function ProjectDetailsPage() {
     fetchProject();
   }, [id]);
 
+  if (loading){
+    return(
+      <div className="background min-vh-100 overflow-auto p-0">
+      <Navbar />
+      <Loading/>
+      </div>
+    );
+  };
+
   return (
     <div className="background min-vh-100 overflow-auto p-0">
       <Navbar />
@@ -43,11 +53,7 @@ function ProjectDetailsPage() {
             <h2 id="eventName">Educatech</h2>
           </div>
 
-          {loading ? (
-            <div className="text-center mt-4">
-              <p>Carregando projeto...</p>
-            </div>
-          ) : error ? (
+           {error ? (
             <div className="d-flex flex-column justify-content-center align-items-center">
               <h5>Projeto não encontrado!</h5>
               <img
@@ -74,7 +80,7 @@ function ProjectDetailsPage() {
                 <label className="label mb-2">Resumo do projeto</label>
                 <p className="text-justify">{project.description}</p>
               </div>
-
+              
               {role === "AVALIADOR" && (
                 <>
                   <div className="col-12 d-flex flex-column align-items-start">
@@ -96,15 +102,7 @@ function ProjectDetailsPage() {
                   </div>
                 </>
               )}
-              {role === "ORIENTADOR" && (
-                  <div className="col-12 d-flex flex-column align-items-start">
-                    <label className="label mb-2">Anexo do projeto</label>
-                    <button className="btn btn-custom btn-regulamento mb-2">
-                      <i className="bi bi-file-earmark-arrow-down me-2"></i>
-                      Adicionar Anexo
-                    </button>
-                  </div>
-                )}
+
             </div>
           )}
         </div>

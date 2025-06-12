@@ -8,21 +8,32 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./../../config/firebase";
 import astronaut from "./../../assets/Astronaut3.svg";
 import ProjectCard from "../../components/projectCard";
+import { useParams } from "react-router-dom";
 
 function ProjectListPage() {
+  const {eventId} = useParams();
   const [projetos, setProjetos] = useState([]);
   const [search, setSearch] = useState("");
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
+        if(!eventId)
         try {
           const resultado = await dbService.getUserProjects();
           setProjetos(resultado);
         } catch (error) {
           console.error("Erro ao buscar projetos:", error);
         }
+        else{
+          try {
+            const resultado = await dbService.getEventProjects(eventId);
+            setProjetos(resultado);
+          } catch (error) {
+            console.error("Erro ao buscar projetos:", error);
+          }
+        }
       } else {
-        console.warn("Usuária não está logada!");
+        console.warn("Usuário não está logado!");
       }
     });
 
@@ -52,7 +63,7 @@ function ProjectListPage() {
           </div>
           {projetos.length === 0 ? (
             <div className="card-create-project d-flex flex-column justify-content-center align-items-center m-auto">
-              <h5>Você ainda não possui nenhum projeto!</h5>
+              <h5>Nenhum projeto aqui por enquanto!</h5>
               <img
                 src={astronaut}
                 className="align-self-center w-50 h-auto m-1"

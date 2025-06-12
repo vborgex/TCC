@@ -13,6 +13,10 @@ import { storageService } from "../../service/storageService";
 import DatePicker from "react-datepicker";
 import { format } from "date-fns";
 import "react-datepicker/dist/react-datepicker.css";
+import {
+  validateNewEventTimeline,
+  validateEditedEventTimeline,
+} from "../../utils/validateEventPhases";
 
 function CreateEventPage() {
   const { eventId } = useParams();
@@ -334,45 +338,50 @@ function CreateEventPage() {
     const evaluatorsEmpty = filteredEvaluators.length === 0;
 
     const phasesWithErrors = phases
-  .map((phase, index) => {
-    const hasCriteria = phase.criteria.some(
-      (criterion) => criterion.value !== ""
-    );
+      .map((phase, index) => {
+        const hasCriteria = phase.criteria.some(
+          (criterion) => criterion.value !== ""
+        );
 
-    const isNumberApprovedFilled = phase.numberApproved !== "";
+        const isNumberApprovedFilled = phase.numberApproved !== "";
 
-    const areRangesFilled = (!phase.evaluationRange.includes(null) && !phase.submissionRange.includes(null))
+        const areRangesFilled =
+          !phase.evaluationRange.includes(null) &&
+          !phase.submissionRange.includes(null);
 
-    const errors = [];
+        const errors = [];
 
-    if (!hasCriteria) {
-      errors.push(
-        `A fase ${index + 1} deve ter pelo menos um critério de avaliação.`
-      );
-    }
+        if (!hasCriteria) {
+          errors.push(
+            `A fase ${index + 1} deve ter pelo menos um critério de avaliação.`
+          );
+        }
 
-    if (!isNumberApprovedFilled) {
-      errors.push(
-        `A fase ${index + 1} deve ter o campo de quantidade de alunos preenchido.`
-      );
-    }
+        if (!isNumberApprovedFilled) {
+          errors.push(
+            `A fase ${
+              index + 1
+            } deve ter o campo de quantidade de alunos preenchido.`
+          );
+        }
 
-    if (!areRangesFilled) {
-      errors.push(
-        `A fase ${index + 1} deve ter os campos de intervalo de avaliação e submissão preenchidos.`
-      );
-    }
+        if (!areRangesFilled) {
+          errors.push(
+            `A fase ${
+              index + 1
+            } deve ter os campos de intervalo de avaliação e submissão preenchidos.`
+          );
+        }
 
-    return errors.length > 0 ? errors : null;
-  })
-  .filter((error) => error !== null);
+        return errors.length > 0 ? errors : null;
+      })
+      .filter((error) => error !== null);
 
-      
     const phasesEmpty = phases.every(
       (phase) => !phase.criteria.some((criterion) => criterion.value !== "")
     );
     const enrollRangeEmpty = enrollmentRange.includes(null);
-    console.log("phases w errors", phasesWithErrors)
+    console.log("phases w errors", phasesWithErrors);
     if (
       categoriesEmpty ||
       educationLevelsEmpty ||
@@ -430,9 +439,36 @@ function CreateEventPage() {
       }));
       return;
     }
+
+    let timelineValidationError = "";
+
+    if (isEditing) {
+      timelineValidationError = validateEditedEventTimeline(
+        { enrollmentRange, phases },
+        {
+          enrollmentRange: event.enrollmentRange,
+          phases: event.phases,
+        }
+      );
+    } else {
+      timelineValidationError = validateNewEventTimeline({
+        enrollmentRange,
+        phases,
+      });
+    }
+
+    if (timelineValidationError.length > 0) {
+      setError((prev) => ({
+        ...prev,
+        general: timelineValidationError.join(" "),
+      }));
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
+      console.log("Fases antes de salvar", phases)
       let fileMetadata = null;
       let imgMetadata = null;
       if (isFileDirty(rulesFile, existingRulesFile)) {
@@ -466,6 +502,7 @@ function CreateEventPage() {
           filteredEvaluators
         );
       } else {
+        console.log("Como as fases chegam no create", phases)
         await dbService.createEvent(
           title,
           description,
@@ -769,7 +806,7 @@ function CreateEventPage() {
                   <input
                     type="file"
                     id="fileInputImg"
-                    accept=" image/*"
+                    accept=" image/jpeg"
                     style={{ display: "none" }}
                     onChange={(e) => handleImageFileChange(e.target.files[0])}
                     disabled={isSubmitting}
