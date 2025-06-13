@@ -4,6 +4,7 @@ import {
   addDoc,
   doc,
   getDoc,
+  setDoc,
   getDocs,
   query,
   where,
@@ -12,6 +13,52 @@ import {
 } from "firebase/firestore";
 
 export const dbService = {
+  async getAssessment(projectId) {
+    try {
+      const assessmentRef = collection(db, "assessments", projectId);
+      const assessment = await getDoc(assessmentRef);
+      return assessment.data();
+    } catch (error) {
+      throw error;
+    }
+  },
+  async createAssessment(projectId, eventId) {
+    try {
+      const assessmentRef = doc(db, "assessments", projectId);
+      const assessment = {
+        projectId,
+        eventId,
+        phases: [],
+      };
+      await setDoc(assessmentRef, assessment);
+    } catch (error) {
+      throw error;
+    }
+  },
+  async updateEvaluatorsForPhase(projectId, phaseIndex, newEvaluators) {
+    try {
+      const assessmentRef = doc(db, "assessments", projectId);
+      const snapshot = await getDoc(assessmentRef);
+
+      if (!snapshot.exists()) {
+        throw new Error("Assessment não encontrado");
+      }
+
+      const assessmentData = snapshot.data();
+      const phases = assessmentData.phases || [];
+
+      while (phases.length <= phaseIndex) {
+        phases.push({ evaluators: [], grades: {}, average: null });
+      }
+
+      phases[phaseIndex].evaluators = newEvaluators;
+
+      await updateDoc(assessmentRef, { phases });
+    } catch (error) {
+      console.error("Erro ao atualizar avaliadores da fase:", error);
+      throw error;
+    }
+  },
   async createProject(
     title,
     description,
@@ -42,7 +89,9 @@ export const dbService = {
         createdAt: serverTimestamp(),
       };
 
-      await addDoc(collection(db, "projects"), newProject);
+      const project = await addDoc(collection(db, "projects"), newProject);
+      const projectId = project.id;
+      await this.createAssessment(projectId, eventId);
     } catch (error) {
       throw error;
     }
@@ -87,6 +136,23 @@ export const dbService = {
       throw error;
     }
   },
+  async getProjectsByIds(projectIds) {
+    try {
+      const projects = await Promise.all(
+        projectIds.map(async (id) => {
+          const docSnap = await getDoc(doc(db, "projects", id));
+          if (docSnap.exists()) {
+            return { id: docSnap.id, ...docSnap.data() };
+          }
+          return null;
+        })
+      );
+
+      return projects.filter((p) => p !== null);
+    } catch (error) {
+      throw error;
+    }
+  },
   async getProjects() {
     try {
       const projectRef = collection(db, "projects");
@@ -100,7 +166,7 @@ export const dbService = {
       throw error;
     }
   },
-  async getEventProjects(eventId){
+  async getEventProjects(eventId) {
     try {
       const projectRef = collection(db, "projects");
       const q = query(projectRef, where("eventId", "==", eventId));
@@ -108,8 +174,8 @@ export const dbService = {
       const projects = [];
       querySnapshot.forEach((doc) => {
         projects.push({ id: doc.id, ...doc.data() });
-        });
-        return projects;
+      });
+      return projects;
     } catch (error) {
       throw error;
     }
@@ -131,7 +197,6 @@ export const dbService = {
       return projects;
     } catch (error) {
       throw error;
-      console.log(error);
     }
   },
   async validateEvaluatorEmails(evaluatorEmails) {
@@ -191,7 +256,6 @@ export const dbService = {
       const educationLevelsToSave = educationLevels
         .map((level) => level.value.trim())
         .filter((val) => val !== "");
-
 
       const newEvent = {
         title,
@@ -275,6 +339,62 @@ export const dbService = {
       throw error;
     }
   },
+  async getEvaluatorEvents() {
+    try {
+      const user = auth.currentUser;
+
+      if (!user) throw new Error("Usuário não autenticado.");
+
+      const eventRef = collection(db, "events");
+      const q = query(
+        eventRef,
+        where("evaluators", "array-contains", user.uid)
+      );
+      const querySnapshot = await getDocs(q);
+
+      const events = [];
+      querySnapshot.forEach((doc) => {
+        events.push({ id: doc.id, ...doc.data() });
+      });
+
+      return events;
+    } catch (error) {
+      throw error;
+    }
+  },
+  async getEvaluatorProjects() {
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error("Usuário não autenticado.");
+
+      const assessmentsRef = collection(db, "assessments");
+      const snapshot = await getDocs(assessmentsRef);
+
+      const projects = [];
+
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const phases = data.phases || [];
+
+        const isEvaluator = phases.some((phase) =>
+          phase.evaluators?.includes(user.uid)
+        );
+
+        if (isEvaluator) {
+          projects.push({
+            assessmentId: docSnap.id,
+            projectId: data.projectId,
+            eventId: data.eventId,
+          });
+        }
+      });
+
+      return projects;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   async getAdmEvents() {
     try {
       const user = auth.currentUser;

@@ -11,26 +11,31 @@ import ProjectCard from "../../components/projectCard";
 import { useParams } from "react-router-dom";
 
 function ProjectListPage() {
-  const {eventId} = useParams();
+  const { eventId, userId } = useParams();
   const [projetos, setProjetos] = useState([]);
   const [search, setSearch] = useState("");
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        if(!eventId)
-        try {
-          const resultado = await dbService.getUserProjects();
-          setProjetos(resultado);
-        } catch (error) {
-          console.error("Erro ao buscar projetos:", error);
-        }
-        else{
+        if (!eventId) {
+          try {
+            const resultado = await dbService.getUserProjects();
+            setProjetos(resultado);
+          } catch (error) {
+            console.error("Erro ao buscar projetos:", error);
+          }
+        } else if (!userId) {
           try {
             const resultado = await dbService.getEventProjects(eventId);
             setProjetos(resultado);
           } catch (error) {
             console.error("Erro ao buscar projetos:", error);
           }
+        } else {
+          const evaluatorAssessments = await dbService.getEvaluatorProjects();
+          const projectIds = evaluatorAssessments.map((p) => p.projectId);
+          const projectData = await dbService.getProjectsByIds(projectIds);
+          setProjetos(projectData);
         }
       } else {
         console.warn("Usuário não está logado!");
@@ -38,7 +43,7 @@ function ProjectListPage() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [eventId, userId]);
   const filteredProjects = projetos.filter((project) =>
     project.title.toLowerCase().includes(search.toLowerCase())
   );

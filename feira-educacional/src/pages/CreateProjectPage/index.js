@@ -38,24 +38,12 @@ function CreateProjectPage() {
     general: "",
   });
 
+
+  console.log(phasesReplies);
   const handlePhaseFileChange = (file, phaseIndex) => {
     if (file && file.type === "application/pdf") {
       const newReplies = [...phasesReplies];
       newReplies[phaseIndex].file = file;
-      setPhasesReplies(newReplies);
-      setError((prev) => ({ ...prev, file: "" }));
-    } else {
-      setError((prev) => ({
-        ...prev,
-        file: "Por favor selecione um arquivo tipo pdf",
-      }));
-    }
-  };
-
-  const handleFileChange = (file, index) => {
-    if (file && file.type === "application/pdf") {
-      const newReplies = [...phasesReplies];
-      newReplies[index].file = file;
       setPhasesReplies(newReplies);
       setError((prev) => ({ ...prev, file: "" }));
     } else {
@@ -86,7 +74,7 @@ function CreateProjectPage() {
           setEvent(resultado);
           const initialPhases = resultado.phases.map((phase) => ({
             textAreas: Array.isArray(phase.textAreas)
-              ? Object.fromEntries(phase.textAreas.map((label) => [label, ""]))
+              ? Object.fromEntries(phase.textAreas.map((item) => [item.value, ""]))
               : {},
             file: null,
           }));

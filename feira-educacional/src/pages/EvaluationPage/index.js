@@ -18,7 +18,6 @@ function EvaluationPage() {
 
   const handleGradeBlur = (e, criterion) => {
     let value = parseFloat(e.target.value);
-
     if (isNaN(value)) {
       value = 0.1;
     }
@@ -128,12 +127,12 @@ function EvaluationPage() {
                 </h5>
                 <form onSubmit={onSubmit}>
                   <div className="row justify-content-start align-items-end">
-                    {event.phases[0].criteria.map((item) => (
+                    {event.phases[0].criteria.map((item, index) => (
                       <div
-                        key={item}
+                      key={index}
                         className="col-lg-6 col-12 d-flex flex-column align-items-start"
                       >
-                        <label className="label mb-2">{item}</label>
+                        <label className="label mb-2">{item.value}</label>
                         <div className="input-group w-50">
                           <input
                             className="form-control mb-2 no-spinner"

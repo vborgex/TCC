@@ -12,18 +12,26 @@ import EventCard from "../../components/eventCard";
 function EventListPage() {
   const [events, setEvents] = useState([]);
   const [search, setSearch] = useState("");
-  
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
-          const resultado = await dbService.getAdmEvents();
-          setEvents(resultado);
+          const userData = await dbService.getUserData(user.uid);
+          if (userData.role === "ORGANIZADOR") {
+            const resultado = await dbService.getAdmEvents();
+            setEvents(resultado);
+
+          } else if (userData.role === "AVALIADOR") {
+            const resultado = await dbService.getEvaluatorEvents();
+            console.log("Resultado",resultado)
+            setEvents(resultado);
+          }
         } catch (error) {
           console.error("Erro ao buscar eventos:", error);
         }
       } else {
-        console.warn("Usuária não está logada!");
+        console.warn("Usuário não está logado!");
       }
     });
     return () => unsubscribe();
@@ -72,10 +80,12 @@ function EventListPage() {
             <div className="row">
               {filteredEvents.map((item) => (
                 <EventCard
+                  img = {item.imgMetadata.url}
                   id={item.id}
                   titulo={item.title}
                   status={"ok"}
                   description={item.description}
+
                 />
               ))}
             </div>

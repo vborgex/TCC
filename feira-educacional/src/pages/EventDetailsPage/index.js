@@ -118,7 +118,24 @@ function EventDetailsPage() {
                     </button>
                   </div>
                 </>
-              ) : null}
+              ) : isLoggedIn && role === "AVALIADOR" ?(
+                <>
+                  <div className="col-6">
+                    <Link   
+                      className=" btn btn-create btn-sm me-2"
+                      to={`/my`}
+                    >
+                      Avaliar Projetos!
+                    </Link>
+                  </div>
+                  <div className="col-6 justify-content-end">
+                    <button className="btn btn-favorite h-100 w-auto 
+                    ">
+                      <i className="bi bi-heart"></i>
+                    </button>
+                  </div>
+                </>
+              ):(<></>)}
             </div>
           </div>
         </div>
